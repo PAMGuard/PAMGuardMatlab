@@ -209,7 +209,7 @@ try
                 case 'ClickClasssifier_1'
                     data.annotations.classification = readClickClsfrAnotation(fid, anId, anLength, fileInfo, anVersion);
                 case 'Matched_Clk_Clsfr'
-                    data.annotations.rwudpclassification = readRWUDPAnnotation(fid, anId, anLength, fileInfo, anVersion);
+                    data.annotations.mclassification = readMatchClsfrAnnotation(fid, anId, anLength, fileInfo, anVersion);
                 case 'BCLS' %Basic classificatio
                     data.annotations.basicclassification = readRWUDPAnnotation(fid, anId, anLength, fileInfo, anVersion);
                 case {'DLRE', 'Delt'}
