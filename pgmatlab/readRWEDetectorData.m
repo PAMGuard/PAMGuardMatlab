@@ -21,7 +21,8 @@ try
         return;
     end
 
-    if (fileInfo.moduleHeader.version==0)
+    isBuoy = (fileInfo.fileHeader.fileFormat == 0);
+    if (fileInfo.moduleHeader.version== 0 || isBuoy)
         data.startSample = fread(fid, 1, 'int64');
         data.channelMap = fread(fid, 1, 'int32');
     end
@@ -43,6 +44,10 @@ try
         data.peakFreqs(i) = fread(fid, 1, 'int16');
         data.hiFreqs(i) = fread(fid, 1, 'int16');
         data.peakAmps(i) = fread(fid, 1, 'float');
+    end
+    if (isBuoy || fileInfo.moduleHeader.version>=1) 
+        data.nDelays = fread(fid,1,'int16');
+        data.delays = fread(fid,data.nDelays,'float');
     end
     
 catch mError
