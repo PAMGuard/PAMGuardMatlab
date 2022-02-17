@@ -45,10 +45,10 @@ try
         data.hiFreqs(i) = fread(fid, 1, 'int16');
         data.peakAmps(i) = fread(fid, 1, 'float');
     end
-    if (isBuoy || fileInfo.moduleHeader.version>=1) 
-        data.nDelays = fread(fid,1,'int16');
-        data.delays = fread(fid,data.nDelays,'float');
-    end
+%     if (isBuoy || fileInfo.moduleHeader.version>=1) 
+%         data.nDelays = fread(fid,1,'int16');
+%         data.delays = fread(fid,data.nDelays,'float');
+%     end
     
 catch mError
     disp(['Error reading ' fileInfo.fileHeader.moduleType '  data object.  Data read:']);
