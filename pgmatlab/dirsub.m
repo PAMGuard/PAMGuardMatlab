@@ -10,6 +10,7 @@ if nargin < 2
 end
 files = searchFolder(rootFolder, mask);
 end
+
 function files = searchFolder(aFolder, mask)
   % first do the fiels in this folder which match the mask.
   % check there is no / or \ on the end of afolder
@@ -21,14 +22,14 @@ function files = searchFolder(aFolder, mask)
   end
   files = dir([aFolder '/' mask]);
   for i = 1:length(files)
-      files(i).name = [aFolder '\' files(i).name];
+      files(i).name = fullfile(aFolder, files(i).name);
   end
   
   % now check out sub folders
   all = dir(aFolder);
   for i = 1:length(all)
-      aFile = [aFolder '\' all(i).name];
-      if ~isdir(aFile)
+      aFile = fullfile(aFolder, all(i).name);
+      if ~isfolder(aFile)
           continue;
       end
       if strcmp(all(i).name(1),'.')

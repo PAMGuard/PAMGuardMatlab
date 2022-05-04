@@ -117,7 +117,7 @@ try
                                 fileInfo.objectType=1000;
                                 fileInfo.readModuleData=@readClickData;
                                 fileInfo.readModuleFooter=@readClickFooter;
-                                fileInfo.readBackgroundData = @readClickBackground
+                                fileInfo.readBackgroundData = @readClickBackground;
                             case 'Trigger Background'
                                 fileInfo.objectType=0;
                                 fileInfo.readModuleData=@readClickTriggerData;
@@ -173,8 +173,8 @@ try
                     case 'GPL Detector'
                         switch fileInfo.fileHeader.streamName
                             case 'GPL Detections'
-                                fileInfo.readModuleData = @readGPLDetections
-                                fileInfo.readBackgroundData = @readSpectralBackground
+                                fileInfo.readModuleData = @readGPLDetections;
+                                fileInfo.readBackgroundData = @readSpectralBackground;
                         end
                     % Right Whale Edge Detector Module
                     case 'RW Edge Detector'
@@ -190,7 +190,7 @@ try
                         fileInfo.objectType=2000;
                         fileInfo.readModuleHeader=@readWMDHeader;
                         fileInfo.readModuleData=@readWMDData;
-                        fileInfo.readBackgroundData = @readSpectralBackground
+                        fileInfo.readBackgroundData = @readSpectralBackground;
                     
                     % Ipi module
                     case 'Ipi module'
