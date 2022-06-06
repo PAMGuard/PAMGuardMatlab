@@ -194,7 +194,7 @@ try
         %         disp(['Number annotation: ' num2str(nAn)  ' ' num2str(anTotLength) ])
         for i = 1:nAn
             filePos = ftell(fid);
-            anLength = fread(fid, 1, 'int16')-2; %tis length does no tinclude itself !
+            anLength = fread(fid, 1, 'int16')-2; %this length does no tinclude itself !
             anId = readJavaUTFString(fid);
             anVersion = fread(fid, 1, 'int16');
             switch (anId)
@@ -214,6 +214,8 @@ try
                     data.annotations.basicclassification = readRWUDPAnnotation(fid, anId, anLength, fileInfo, anVersion);
                 case {'DLRE', 'Delt'}
                     data.annotations.dlclassification = readDLAnnotation(fid, anId, anLength, fileInfo, anVersion);
+                case {'Uson', 'USON'}
+                    data.annotations.userFormData = readUserFormAnnotation(fid, anId, anLength, fileInfo, anVersion);
                 otherwise
                     fprintf('Unknown anotation type "%s" length %d version %d in file\n', ...
                         anId, anLength, anVersion);

@@ -44,7 +44,8 @@ while iArg < numel(varargin)
    switch(varargin{iArg})
        case 'timerange'
            iArg = iArg + 1;
-           timeRange = dateNumToMillis(varargin{iArg});
+%            timeRange = dateNumToMillis(varargin{iArg});
+           timeRange = varargin{iArg};
        case 'uidrange'
            iArg = iArg + 1;
            uidRange = varargin{iArg};
@@ -117,7 +118,7 @@ try
                                 fileInfo.objectType=1000;
                                 fileInfo.readModuleData=@readClickData;
                                 fileInfo.readModuleFooter=@readClickFooter;
-                                fileInfo.readBackgroundData = @readClickBackground
+                                fileInfo.readBackgroundData = @readClickBackground;
                             case 'Trigger Background'
                                 fileInfo.objectType=0;
                                 fileInfo.readModuleData=@readClickTriggerData;
