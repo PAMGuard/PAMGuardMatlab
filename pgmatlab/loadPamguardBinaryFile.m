@@ -44,7 +44,9 @@ while iArg < numel(varargin)
    switch(varargin{iArg})
        case 'timerange'
            iArg = iArg + 1;
-           timeRange = dateNumToMillis(varargin{iArg});
+%            timeRange = dateNumToMillis(varargin{iArg});
+           %datestr(varargin{iArg})
+             timeRange = varargin{iArg};
        case 'uidrange'
            iArg = iArg + 1;
            uidRange = varargin{iArg};

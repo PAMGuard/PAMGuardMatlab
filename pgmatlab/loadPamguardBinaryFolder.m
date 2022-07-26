@@ -43,6 +43,7 @@ for i = 1:numel(d)
     % need to use varargin{:} to pass arguments from one function to
     % another for some reason.
     [dat, fInf] = loadPamguardBinaryFile(d(i).name, varargin{:});
+    disp(['Loaded ' num2str(length(data)) ' detections' ])
     if timesonly
         dat = [[dat.UID]; [dat.date]; [dat.type]]; %dates are accurate to 10us
     end
