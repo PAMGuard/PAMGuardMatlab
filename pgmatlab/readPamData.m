@@ -1,4 +1,4 @@
-function [data, selState] = readPamData(fid, fileInfo, timeRange, uidRange)
+function [data, selState] = readPamData(fid, fileInfo, timeRange, uidRange, uidList)
 % Reads in the object data that is common to all modules.  This reads up to
 % (but not including) the object binary length, and then calls a function
 % to read the module-specific data.
@@ -61,7 +61,7 @@ selState = 1;
 % to read this one
 objectLen = fread(fid, 1, 'int32');
 curObj = ftell(fid);
-nextObj = curObj + objectLen;
+nextObj = curObj + objectLen-4;
 
 % first thing to check is that this is really the type of object we think
 % it should be, based on the file header.  If not, warn the user, move the
@@ -155,6 +155,9 @@ try
     
     % set date, to maintain backwards compatibility
     data.date = millisToDateNum(data.millis);
+
+    % now look at where we are in the list. Can we skip reading the
+    % rest of this dat apoint ? Can we be done with reading alltogether ? 
     %     disp(['Check date' num2str(data.date) ' for ' num2str(timeRange(1))...
     %         ' to ' num2str(timeRange(2))])
     if (data.date < timeRange(1))
@@ -162,10 +165,30 @@ try
     elseif (data.date > timeRange(2))
         selState = 2;
     end
+
+    if ~isempty(uidList) && ~isBackground
+        inList = sum(uidList == data.UID) > 0;
+        if ~inList
+            selState = 0;
+        end
+        if (data.UID > max(uidList))
+            selState = 2;
+        end
+    end
+
+    if (selState == 2) 
+        % no need to read any more
+        return;
+    end
+    if (selState == 0)
+        % skip to end then return
+        fseek(fid, nextObj, 'bof');
+        return;
+    end
     
     % now read the module-specific data
     if isBackground
-        if(isa(fileInfo.readModuleData,'function_handle'))
+        if(isa(fileInfo.readBackgroundData,'function_handle'))
             [data, error] = fileInfo.readBackgroundData(fid, fileInfo, data);
             if (error)
                 disp(['Error - cannot retrieve ' fileInfo.fileHeader.moduleType ' data properly.']);

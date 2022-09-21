@@ -197,6 +197,10 @@ try
                     case 'Ipi module'
                         fileInfo.objectType=0;
                         fileInfo.readModuleData=@readIpiData;
+
+                    case 'Gemini Threshold Detector'
+                        fileInfo.objectType = 0;
+                        fileInfo.readModuleData=@readTritechTrack;
                         
                     % Note: PamRawDataBlock has it's own Binary Store (RawDataBinarySource),
                     % but it is created by multiple different processes so doesn't have one
@@ -257,7 +261,10 @@ try
                 if (isempty(fileInfo.fileHeader))
                     disp('Error: found data before file header.  Aborting load');
                 end
-                [dataPoint, selState] = readPamData(fid, fileInfo, timeRange, uidRange);
+                [dataPoint, selState] = readPamData(fid, fileInfo, timeRange, uidRange, uidList);
+                if (selState == 2) 
+                    break;
+                end
                 newP = ftell(fid);
                 pErr = newP - (prevPos+nextLen);
                 if pErr ~= 0
@@ -285,15 +292,15 @@ try
                 if selState > 0
                     selState = filterfun(dataPoint);
                 end
-                                                
-                % Preallocation. Acheived by adding new data points beyond
-                % the end of the existing array, then shortening the array
-                % before it is returned to the user.
                 if (selState == 0)
                     continue;
                 elseif (selState == 2) 
                     break;
                 end
+                                                
+                % Preallocation. Acheived by adding new data points beyond
+                % the end of the existing array, then shortening the array
+                % before it is returned to the user.
                 nData = nData + 1;
                 dataSet = checkArrayAllocation(dataSet, nData, dataPoint);
                 dataSet(nData) = dataPoint;
