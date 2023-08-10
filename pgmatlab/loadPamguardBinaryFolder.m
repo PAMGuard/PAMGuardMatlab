@@ -23,8 +23,17 @@ for i = 1:numel(d)
             fprintf('Loading %d/%d (%d) %s\n', i, numel(d), numel(data), d(i).name);
         end
     end
+    [fRoot, fName, fEnd] = fileparts(d(i).name);
+    fileNameOnly = [fName fEnd];
     [dat fInf] = loadPamguardBinaryFile(d(i).name, 'filter', filterfun);
     if ~isempty(dat)
+        % need to add bookkeeping data to dat so that we know which file
+        % each click comes from and also know which click it is within the
+        % file. 
+        for iDat = 1:numel(dat)
+            dat(iDat).clickNumber = iDat;
+            dat(iDat).fileName = fileNameOnly;
+        end
         data = [data dat];
     end
     if isfield(fInf, 'background')

@@ -5,7 +5,9 @@ function [dn millis] = dbdate2datenum(dbdate)
   if iscell(dbdate)
     n = length(dbdate);
     for i = 1:n
-      [dn(i) millis(i)] = dbdate2datenum(dbdate{i});
+        [aDate, ms] = dbdate2datenum(dbdate{i});
+      dn(i) = aDate;
+          millis(i) = ms;
     end
     return;
   end

@@ -32,7 +32,8 @@ function [dataSet, fileInfo] = loadPamguardBinaryFile(fileName, varargin)
 % will return an optional fileInfo structure containing header and footer
 % information from the file which includes information such as the data
 % start and end times. 
-
+dataSet = [];
+fileInfo = [];
 nBackground = 0;
 timeRange = [-Inf +Inf];
 uidRange = [-Inf +Inf];
@@ -201,6 +202,7 @@ try
                     case 'Gemini Threshold Detector'
                         fileInfo.objectType = 0;
                         fileInfo.readModuleData=@readTritechTrack;
+                        fileInfo.readBackgroundData = @readTritechBackground;
                         
                     % Note: PamRawDataBlock has it's own Binary Store (RawDataBinarySource),
                     % but it is created by multiple different processes so doesn't have one
@@ -321,7 +323,10 @@ if nBackground > 0
     fileInfo.background = backgroundData;
 end
 % close the file and return to the calling function
+try
 fclose(fid);
+catch
+end
 return;
 end
 

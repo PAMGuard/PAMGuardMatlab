@@ -34,7 +34,7 @@ persistent   TIMEDELAYSSECS
 persistent   HASBINARYANNOTATIONS
 
 if isempty(TIMEMILLIS)
-    %only declarfe these once
+    %only declare these once
     TIMEMILLIS           = hex2dec('1');
     TIMENANOS            = hex2dec('2');
     CHANNELMAP           = hex2dec('4');
@@ -188,13 +188,19 @@ try
     
     % now read the module-specific data
     if isBackground
-        if(isa(fileInfo.readBackgroundData,'function_handle'))
-            [data, error] = fileInfo.readBackgroundData(fid, fileInfo, data);
-            if (error)
-                disp(['Error - cannot retrieve ' fileInfo.fileHeader.moduleType ' data properly.']);
-                fseek(fid, nextObj, 'bof');
-                return;
+        hasBgndReader = sum(strcmp(fields(fileInfo),'readBackgroundData'));
+        if (hasBgndReader)
+            if(isa(fileInfo.readBackgroundData,'function_handle'))
+                [data, error] = fileInfo.readBackgroundData(fid, fileInfo, data);
+                if (error)
+                    disp(['Error - cannot retrieve ' fileInfo.fileHeader.moduleType ' data properly.']);
+                    fseek(fid, nextObj, 'bof');
+                    return;
+                end
             end
+        else
+            disp('Module type has no background data reader')
+            fseek(fid, nextObj, 'bof');
         end
     else
         if(isa(fileInfo.readModuleData,'function_handle'))

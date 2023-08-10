@@ -1,4 +1,4 @@
-function eventData = loadPamguardMultiFile(dataDir, fileNames, itemUID)
+function eventData = loadPamguardMultiFile(dataDir, fileNames, itemUID, verbose)
 % function to load all data from an event even if spread over multiple
 % files. This can be used to get binary file data for data associated with
 % PAMGuard 'events' marked out using the click detector or the 'Detection
@@ -18,11 +18,22 @@ function eventData = loadPamguardMultiFile(dataDir, fileNames, itemUID)
 % returns binary data from multiple files. 
 
 eventData = [];
+if nargin < 4
+    verbose = 0;
+end
 
 % find the files we need using the findBinaryFile function. 
 % unique file list
 unFiles = unique(fileNames);
 for i = 1:numel(unFiles) % loop over the different files
+
+    if (verbose)
+        fileName = unFiles{i};
+        if length(dataDir) < length(fileName)
+            fileName = fileName(length(dataDir):end);
+        end
+        fprintf('Loading file %s %d of %d\n', fileName, i, numel(unFiles));
+    end
 
     filePath = findBinaryFile(dataDir,'*.pgdf',unFiles{i});
 
