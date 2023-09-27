@@ -9,6 +9,15 @@ function con = sqlitedatabase(fn)
 % You wil then need to add the jar file to your Matlab Java class path
 % or put it in a folder somewhere in your 'normal' Matlab path and
 % it will be loaded dynamically as needed.
+persistent waswarned;
+if isempty(waswarned)
+    waswarned = 1;
+    disp(' ************************ OBSOLETE FUNCTION ************************');
+    disp(' * You''re probably better off using the in built sqlite function   *' );
+    disp(' * to open sqlite database files. This one is OK for reading, but  *');
+    disp(' * does not write timestamps to the database in the correct format *');
+    disp(' *******************************************************************');
+end
 
 % declare the driver and protocl needed to open the database.
 driver = 'org.sqlite.JDBC';

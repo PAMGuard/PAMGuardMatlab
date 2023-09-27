@@ -13,6 +13,7 @@ function [dn millis] = dbdate2datenum(dbdate)
   end
     
   dbdate = deblank(dbdate);
+  dbdate = strrep(dbdate,'''','');
   % dbdate will be in the format YYYY-MM-DD HH:MM:SS.ms which matlab doesn't understand !
   YY = str2num(dbdate(1:4));
   MM = str2num(dbdate(6:7));
