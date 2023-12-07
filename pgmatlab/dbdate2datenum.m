@@ -4,6 +4,8 @@ function [dn millis] = dbdate2datenum(dbdate)
 %  into a datenum (standard Matlab time)
 if iscell(dbdate)
     n = length(dbdate);
+    dn = zeros(size(dbdate));
+    millis = zeros(size(dbdate));
     for i = 1:n
         [aDate, ms] = dbdate2datenum(dbdate{i});
         dn(i) = aDate;
@@ -11,8 +13,20 @@ if iscell(dbdate)
     end
     return;
 end
+if size(dbdate,1) > 1
+    % this will happen if it's an array of UTC times read from a table.
+    n = size(dbdate, 1);
 if isstring(dbdate)
     dbdate = char(dbdate);
+    dn = zeros(n,1);
+    millis = zeros(n,1);
+    for i = 1:n
+        [aDate, ms] = dbdate2datenum(dbdate(i,:));
+        dn(i) = aDate;
+        millis(i) = ms;
+    end
+    return;
+end
 end
 dbdate = deblank(dbdate);
 dbdate = strrep(dbdate,'''','');

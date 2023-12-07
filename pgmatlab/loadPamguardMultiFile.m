@@ -41,6 +41,13 @@ for i = 1:numel(unFiles) % loop over the different files
     fileUIDs = itemUID(find(strcmp(fileNames, unFiles{i})));
 
     fileData = loadPamguardBinaryFile(filePath, 'uidlist', fileUIDs);
+    % add the file information to all data loaded. 
+    [~,fName,fEnd] = fileparts(filePath);
+    fileName = [fName fEnd];
+    for d = 1:numel(fileData)
+        fileData(d).binaryFile = fileName;
+    end
+
     eventData = [eventData fileData];
 end
 
