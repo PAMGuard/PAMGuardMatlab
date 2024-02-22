@@ -283,9 +283,9 @@ try
                 if ~isempty(uidList)
                     try 
                         dataUID = dataPoint.UID;
-                        if dataUID > uidList(end)
-                            break;
-                        end
+                        % if dataUID > uidList(end)
+                        %     break;
+                        % end
                         selState = sum(dataUID == uidList);
                     catch
                         
