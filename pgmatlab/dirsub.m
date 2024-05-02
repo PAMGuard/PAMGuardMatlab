@@ -14,13 +14,13 @@ end
 function files = searchFolder(aFolder, mask)
   % first do the fiels in this folder which match the mask.
   % check there is no / or \ on the end of afolder
-%  disp(['Search folder ' aFolder]);
+  %disp(['Search folder ' aFolder]);
   files = [];
   lastChar = aFolder(end);
   if strcmp(lastChar, '/') || strcmp(lastChar, '\')
       aFolder = aFolder([1:end-1]);
   end
-  files = dir([aFolder '/' mask]);
+  files = dir(fullfile(aFolder , mask));
   for i = 1:length(files)
       files(i).name = fullfile(aFolder, files(i).name);
   end

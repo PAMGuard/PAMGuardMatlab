@@ -14,7 +14,6 @@ function [data, error] = readClickData(fid, fileInfo, data)
 error=false;
 
 try
-    
     % read click detector specific data
     dataLength = fread(fid, 1, 'int32');
     if (dataLength==0)
@@ -38,13 +37,18 @@ try
         nDelays = fread(fid, 1, 'int16');
         if (nDelays)
             data.delays = fread(fid, nDelays, 'float');
+        else 
+            data.delays=[]; 
         end
     end
     
     nAngles = fread(fid, 1, 'int16');
     if (nAngles)
         data.angles = fread(fid, nAngles, 'float');
+    else
+         data.angles = []; 
     end
+
     
     if (fileInfo.moduleHeader.version >= 3)
         nAngleErrors = fread(fid, 1, 'int16');

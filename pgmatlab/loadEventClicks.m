@@ -37,8 +37,6 @@ if isempty(openClickDir)
     openFileList = openFileList(ia);
 end
 
-
-
 % should now be able to find files pretty efficiently !
 % unique file list
 unFiles = unique(fileNames);
