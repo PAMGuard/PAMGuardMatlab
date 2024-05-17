@@ -47,7 +47,6 @@ while iArg < numel(varargin)
        case 'timerange'
            iArg = iArg + 1;
 %            timeRange = dateNumToMillis(varargin{iArg});
-           %datestr(varargin{iArg})
            timeRange = varargin{iArg};
        case 'uidrange'
            iArg = iArg + 1;
@@ -270,7 +269,7 @@ try
                 if (isempty(fileInfo.fileHeader))
                     disp('Error: found data before file header.  Aborting load');
                 end
-             
+
                 [dataPoint, selState] = readPamData(fid, fileInfo, timeRange, uidRange, uidList);
                 if (selState == 2) 
                     break;
