@@ -48,7 +48,6 @@ while iArg < numel(varargin)
            iArg = iArg + 1;
 %            timeRange = dateNumToMillis(varargin{iArg});
            %datestr(varargin{iArg})
-             timeRange = varargin{iArg};
            timeRange = varargin{iArg};
        case 'uidrange'
            iArg = iArg + 1;
