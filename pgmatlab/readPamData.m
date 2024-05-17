@@ -1,4 +1,4 @@
-function [data, selState] = readPamData(fid, fileInfo, timeRange, uidRange)
+function [data, selState] = readPamData(fid, fileInfo, timeRange, uidRange, uidList)
 % Reads in the object data that is common to all modules.  This reads up to
 % (but not including) the object binary length, and then calls a function
 % to read the module-specific data.
@@ -34,7 +34,7 @@ persistent   TIMEDELAYSSECS
 persistent   HASBINARYANNOTATIONS
 
 if isempty(TIMEMILLIS)
-    %only declarfe these once
+    %only declare these once
     TIMEMILLIS           = hex2dec('1');
     TIMENANOS            = hex2dec('2');
     CHANNELMAP           = hex2dec('4');
@@ -61,7 +61,7 @@ selState = 1;
 % to read this one
 objectLen = fread(fid, 1, 'int32');
 curObj = ftell(fid);
-nextObj = curObj + objectLen;
+nextObj = curObj + objectLen-4;
 
 % first thing to check is that this is really the type of object we think
 % it should be, based on the file header.  If not, warn the user, move the
@@ -107,8 +107,8 @@ try
         data.UID = fread(fid,1,'int64');
         if (data.UID < uidRange(1))
             selState = 0;
-        elseif (data.UID > uidRange(2))
-            selState = 2;
+        % elseif (data.UID > uidRange(2))
+        %     selState = 2;
         end
     end
     
@@ -155,6 +155,9 @@ try
     
     % set date, to maintain backwards compatibility
     data.date = millisToDateNum(data.millis);
+
+    % now look at where we are in the list. Can we skip reading the
+    % rest of this dat apoint ? Can we be done with reading alltogether ? 
     %     disp(['Check date' num2str(data.date) ' for ' num2str(timeRange(1))...
     %         ' to ' num2str(timeRange(2))])
     if (data.date < timeRange(1))
@@ -162,16 +165,44 @@ try
     elseif (data.date > timeRange(2))
         selState = 2;
     end
+
+    if ~isempty(uidList) && ~isBackground
+        inList = sum(uidList == data.UID) > 0;
+        if ~inList
+            selState = 0;
+        end
+        % rare situations where UID's not in order and this can go badly
+        % wrong. 
+        % if (data.UID > max(uidList))
+        %     selState = 2;
+        % end
+    end
+
+    if (selState == 2) 
+        % no need to read any more
+        return;
+    end
+    if (selState == 0)
+        % skip to end then return
+        fseek(fid, nextObj, 'bof');
+        return;
+    end
     
     % now read the module-specific data
     if isBackground
-        if(isa(fileInfo.readModuleData,'function_handle'))
-            [data, error] = fileInfo.readBackgroundData(fid, fileInfo, data);
-            if (error)
-                disp(['Error - cannot retrieve ' fileInfo.fileHeader.moduleType ' data properly.']);
-                fseek(fid, nextObj, 'bof');
-                return;
+        hasBgndReader = sum(strcmp(fields(fileInfo),'readBackgroundData'));
+        if (hasBgndReader)
+            if(isa(fileInfo.readBackgroundData,'function_handle'))
+                [data, error] = fileInfo.readBackgroundData(fid, fileInfo, data);
+                if (error)
+                    disp(['Error - cannot retrieve ' fileInfo.fileHeader.moduleType ' data properly.']);
+                    fseek(fid, nextObj, 'bof');
+                    return;
+                end
             end
+        else
+            disp('Module type has no background data reader')
+            fseek(fid, nextObj, 'bof');
         end
     else
         if(isa(fileInfo.readModuleData,'function_handle'))
@@ -194,7 +225,7 @@ try
         %         disp(['Number annotation: ' num2str(nAn)  ' ' num2str(anTotLength) ])
         for i = 1:nAn
             filePos = ftell(fid);
-            anLength = fread(fid, 1, 'int16')-2; %tis length does no tinclude itself !
+            anLength = fread(fid, 1, 'int16')-2; %this length does no tinclude itself !
             anId = readJavaUTFString(fid);
             anVersion = fread(fid, 1, 'int16');
             switch (anId)
@@ -214,6 +245,8 @@ try
                     data.annotations.basicclassification = readRWUDPAnnotation(fid, anId, anLength, fileInfo, anVersion);
                 case {'DLRE', 'Delt'}
                     data.annotations.dlclassification = readDLAnnotation(fid, anId, anLength, fileInfo, anVersion);
+                case {'Uson', 'USON'}
+                    data.annotations.userFormData = readUserFormAnnotation(fid, anId, anLength, fileInfo, anVersion);
                 otherwise
                     fprintf('Unknown anotation type "%s" length %d version %d in file\n', ...
                         anId, anLength, anVersion);
