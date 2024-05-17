@@ -3,3 +3,11 @@
 
 # Matlab data
 *.mat
+.DS_Store
+.MATLABDriveTag
+pgmatlab/.MATLABDriveTag
+pgmatlab/Array/.MATLABDriveTag
+.DS_Store
+.MATLABDriveTag
+pgmatlab/.MATLABDriveTag
+pgmatlab/Array/.MATLABDriveTag

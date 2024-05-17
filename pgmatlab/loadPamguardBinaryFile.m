@@ -40,6 +40,7 @@ uidRange = [-Inf +Inf];
 uidList = [];
 iArg = 0;
 filterfun = @passalldata;
+channelmap=-1;
 while iArg < numel(varargin)
     iArg = iArg + 1;
    switch(varargin{iArg})
@@ -56,6 +57,9 @@ while iArg < numel(varargin)
        case 'filter'
            iArg = iArg + 1;
            filterfun = varargin{iArg};
+       case 'channel'
+           iArg = iArg + 1;
+           channelmap = varargin{iArg};
    end          
 end
 selState = 0;
@@ -105,6 +109,7 @@ try
             % string unique to that module.
             case -1
                 fileInfo.fileHeader = readFileHeader(fid);
+                disp(fileInfo.fileHeader.moduleType);
                 switch fileInfo.fileHeader.moduleType
                     
                     % AIS Processing Module
@@ -134,11 +139,12 @@ try
                     case 'Deep Learning Classifier'
                         disp(['Deep learning stream: ' fileInfo.fileHeader.streamName])
                          switch fileInfo.fileHeader.streamName
-                            case 'DL_detection'
+                            case {'DL_detection', 'DL detection'}
                                fileInfo.objectType=1;
                                fileInfo.readModuleData=@readDLDetData;
-                            case 'DL_Model_Data'
-                               %TODO
+                            case {'DL_Model_Data', 'DL Model Data'}
+                               fileInfo.objectType=0;
+                               fileInfo.readModuleData=@readDLModelData;
                          end
 
                         
@@ -175,8 +181,8 @@ try
                     case 'GPL Detector'
                         switch fileInfo.fileHeader.streamName
                             case 'GPL Detections'
-                                fileInfo.readModuleData = @readGPLDetections
-                                fileInfo.readBackgroundData = @readSpectralBackground
+                                fileInfo.readModuleData = @readGPLDetections;
+                                fileInfo.readBackgroundData = @readSpectralBackground;
                         end
                     % Right Whale Edge Detector Module
                     case 'RW Edge Detector'
@@ -192,7 +198,7 @@ try
                         fileInfo.objectType=2000;
                         fileInfo.readModuleHeader=@readWMDHeader;
                         fileInfo.readModuleData=@readWMDData;
-                        fileInfo.readBackgroundData = @readSpectralBackground
+                        fileInfo.readBackgroundData = @readSpectralBackground;
                     
                     % Ipi module
                     case 'Ipi module'
@@ -263,6 +269,7 @@ try
                 if (isempty(fileInfo.fileHeader))
                     disp('Error: found data before file header.  Aborting load');
                 end
+
                 [dataPoint, selState] = readPamData(fid, fileInfo, timeRange, uidRange, uidList);
                 if (selState == 2) 
                     break;
@@ -291,6 +298,11 @@ try
                         
                     end
                 end
+                
+                if channelmap>0 && channelmap~=dataPoint.channelMap
+                    continue;
+                end
+
                 if selState > 0
                     selState = filterfun(dataPoint);
                 end
@@ -306,6 +318,7 @@ try
                 nData = nData + 1;
                 dataSet = checkArrayAllocation(dataSet, nData, dataPoint);
                 dataSet(nData) = dataPoint;
+                
 %                 dataSet = [dataSet dataPoint];
         end
         if (selState == 2)
