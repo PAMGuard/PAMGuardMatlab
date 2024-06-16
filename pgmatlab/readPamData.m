@@ -171,9 +171,9 @@ try
         if ~inList
             selState = 0;
         end
-        if (data.UID > max(uidList))
-            selState = 2;
-        end
+        % if (data.UID > max(uidList))
+        %     selState = 2;
+        % end
     end
 
     if (selState == 2) 
