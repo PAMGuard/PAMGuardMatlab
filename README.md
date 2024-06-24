@@ -8,14 +8,14 @@ PAMGuard binary files contains detections such as clicks, whistle contours, deep
 
 ### Tutorial
 
-The core function of this library is `loadPamguardBinaryFile`. This loads any PAMGuard binary file, automtically figures out what type of data it contains and then imports the data into a struct with relevent field names. Usage is straightforward, simply point the function to the correct file. 
+The core function of this library is `loadPamguardBinaryFile`. This loads any PAMGuard binary file, automatically figures out what type of data it contains and then imports the data into a struct with relevant field names. Usage is straightforward, simply point the function to the correct file. 
 
 ```matlab
 binaryfile= './Files/SomeBinaryFile.pgdf'
 [binarydata, fileinfo]= loadPamguardBinaryFile(myBinaryFile)
 ```
 
-`fileinfo` contains information about the binary file e.g. when it was created, what version of PAMGuard was used to process the data. `binarydata` is a struct with relevent field names. Some of these filed names are c<mark>o</mark>nsistant across different types of detections e.g. millis, date, UID and others are uniquwe to the particular detection. 
+`fileinfo` contains information about the binary file e.g. when it was created, what version of PAMGuard was used to process the data. `binarydata` is a struct with relevant field names. Some of these field names are consistent across different types of detections e.g. millis, date, UID and others are unique to the particular detection. 
 
 An example of the fields from a click detection are:
 
@@ -25,7 +25,7 @@ converted to a date/time with millisecond accuracy.
 **date:** the start time of the click in MATLAB datenum format. Use datastr(date)
 to show a time string.
 
-**UID:**  a unique serial number for the
+**UID:**  a unique serial number for the
 detection. Within a processed dataset no other detection will have this number.
 
 **startSample:** The first sample of this click- often used for
