@@ -23,9 +23,14 @@ if isstring(dbdate)
     dn = zeros(n,1);
     millis = zeros(n,1);
     for i = 1:n
+        try
         [aDate, ms] = dbdate2datenum(dbdate(i,:));
         dn(i) = aDate;
         millis(i) = ms;
+        catch
+            disp('crap date');
+            dbdate(i,:)
+        end
     end
     return;
 end

@@ -198,7 +198,18 @@ try
                         fileInfo.objectType=2000;
                         fileInfo.readModuleHeader=@readWMDHeader;
                         fileInfo.readModuleData=@readWMDData;
-                        fileInfo.readBackgroundData = @readSpectralBackground;
+                        fileInfo.readBackgroundData = @readSpectralBackground
+
+                    case {'Energy Sum Detector','Spectrogram Correlation Detector','Matched Filter Detector'}
+                        switch fileInfo.fileHeader.streamName
+                            % Ishmael detector data
+                            case 'Ishmael Peak Data'
+                                fileInfo.readModuleData=@readIshmaelData;
+
+                                % Ismael detections
+                            case 'Ishmael Detections'
+                                fileInfo.readModuleData=@readIshmaelDetection;
+                        end
                     
                     % Ipi module
                     case 'Ipi module'
