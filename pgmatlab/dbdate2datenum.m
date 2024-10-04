@@ -1,4 +1,6 @@
-function [dn millis] = dbdate2datenum(dbdate)
+function [dn, millis] = dbdate2datenum(dbdate)
+dbdate=convertStringsToChars(dbdate);
+
 % function dn = dbdate2datenum(dbdate)
 %  converts a YYYY-MM-DD HH:MM:SS.ms datestring returned from a database
 %  into a datenum (standard Matlab time)
@@ -21,9 +23,14 @@ if isstring(dbdate)
     dn = zeros(n,1);
     millis = zeros(n,1);
     for i = 1:n
+        try
         [aDate, ms] = dbdate2datenum(dbdate(i,:));
         dn(i) = aDate;
         millis(i) = ms;
+        catch
+            disp('crap date');
+            dbdate(i,:)
+        end
     end
     return;
 end

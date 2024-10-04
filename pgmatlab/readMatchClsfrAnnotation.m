@@ -32,7 +32,7 @@ if (anVersion==2)
 ntemplates = fread(fid, 1, 'int16'); % short in Java
 
 n=1; 
-data=zeros(1, 3*ntemplates); % pre allocate the data array, 
+data=zeros(ntemplates,3); % pre allocate the data array, 
 for i=1:ntemplates
     
     %the threshold value. This is used to classify the clicks.
@@ -44,11 +44,9 @@ for i=1:ntemplates
     %the max correlation value between the reject template and the click.
     rejectcorr = fread(fid, 1, 'double');
     
-    data(n)   =   threshold;
-    n=n+1; 
-    data(n)   =   matchcorr;
-    n=n+1;
-    data(n)   =   rejectcorr;
+    data(n,1)   =   threshold;
+    data(n,2)   =   matchcorr;
+    data(n,3)   =   rejectcorr;
     n=n+1; 
     
 end

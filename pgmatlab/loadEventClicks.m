@@ -1,4 +1,4 @@
-function evClicks = loadEventClicks(dataDir, fileNames, clickUID, eventDateRange)
+function evClicks = loadEventClicks(dataDir, fileNames, clickNos, eventDateRange)
 % function to load all clicks from an event even if spread over multiple files.
 % inputs are root data folder, cell array of binary file names and click
 % numbers
@@ -11,7 +11,7 @@ oneSecond = 1/(3600*24);
 % first a bit of mucking about to get a directory listing of all
 % files. These are held globally so that they can be reused in
 % subsequent calls.
-global openClickDir openFileList openFileNames;
+global openClickDir openFileList openFileNames currentfile fileClicks
 if ~isempty(openClickDir)
     if strcmp(openClickDir, dataDir) == 0
         openClickDir = [];
@@ -32,24 +32,38 @@ if isempty(openClickDir)
         [path name ext] = fileparts(openFileList(i).name);
         openFileNames{i} = [name ext];
     end
+
+    [openFileNames, ia] = unique(openFileNames);
+    openFileList = openFileList(ia);
 end
+
 % should now be able to find files pretty efficiently !
 % unique file list
 unFiles = unique(fileNames);
 for i = 1:numel(unFiles) % loop over the different files
     % list of clicks in a particular file
-    fileClickNos = clickUID(find(strcmp(fileNames, unFiles{i})));
+    fileClickNos = clickNos(find(strcmp(fileNames, unFiles{i})));
     % now find the file !
-    fileIndex = find(strcmp(openFileNames, unFiles{i}));
+    fileIndex = find(contains(openFileNames, unFiles{i}));
     if numel(fileIndex) ~= 1
-        error(sprintf('Unable to find click file %s', unFiles{i}));
+        error(sprintf('Unable to find click file |%s|', unFiles{i}));
     end
+
     % put start date 0 to always read from start of file - makes indexing
     % easier.
-    %     fileClicks = loadClickFile(openFileList(fileIndex).name, ...
-    %          0, eventDateRange(2)+oneSecond*2, 5000);
-    % click numbers are zero indexed from the database but 1 indexed from file.
-    %     evClicks = [evClicks fileClicks(fileClickNos+1)];
-    evClicks = loadPamguardBinaryFile(openFileList(fileIndex).name, 'uidlist', clickUID);
-end
+    if (isempty(fileClicks)  || isempty(currentfile) || ~strcmp(currentfile, openFileList(fileIndex).name))
+        disp(['Loading file ' openFileList(fileIndex).name])
+        fileClicks = loadPamguardBinaryFile(openFileList(fileIndex).name, ...
+            'timerange', [0, eventDateRange(2)+oneSecond*2]);
+        currentfile = openFileList(fileIndex).name;
+    end
 
+    if (~exist('fileClicks', 'var') || isempty(fileClicks))
+        continue
+    end
+
+    disp(['The number of file clicks: ' num2str(length(fileClicks))]);
+
+    % click numbers are zero indexed from the database but 1 indexed from file.
+    evClicks = [evClicks fileClicks(fileClickNos+1)];
+end

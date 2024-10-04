@@ -107,8 +107,8 @@ try
         data.UID = fread(fid,1,'int64');
         if (data.UID < uidRange(1))
             selState = 0;
-        elseif (data.UID > uidRange(2))
-            selState = 2;
+        % elseif (data.UID > uidRange(2))
+        %     selState = 2;
         end
     end
     
@@ -171,6 +171,8 @@ try
         if ~inList
             selState = 0;
         end
+        % rare situations where UID's not in order and this can go badly
+        % wrong. 
         % if (data.UID > max(uidList))
         %     selState = 2;
         % end
