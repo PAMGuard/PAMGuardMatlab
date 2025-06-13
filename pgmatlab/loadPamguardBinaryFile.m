@@ -109,7 +109,7 @@ try
             % string unique to that module.
             case -1
                 fileInfo.fileHeader = readFileHeader(fid);
-                disp(fileInfo.fileHeader.moduleType);
+                % disp(fileInfo.fileHeader.moduleType);
                 switch fileInfo.fileHeader.moduleType
                     
                     % AIS Processing Module
