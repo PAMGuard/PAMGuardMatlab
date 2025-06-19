@@ -1,4 +1,4 @@
-function [data background] = loadPamguardBinaryFolder(dir, fileMask, verbose, filterfun)
+function [data background fileInfos] = loadPamguardBinaryFolder(dir, fileMask, verbose, filterfun)
 % load all data from a folder and it's sub folders
 %  data = loadPamguardBinaryFolder(dir, fileMask, verbose) loads all data from 
 % the folder dir where files satisfy the fileMask. All files must
@@ -38,6 +38,12 @@ for i = 1:numel(d)
     end
     if isfield(fInf, 'background')
         background = [background fInf.background];
+    end
+    if nargout >= 3
+        if i == 1
+            fileInfos(numel(d)) = fInf; % allocate entire array
+        end
+        fileInfos(i) = fInf;
     end
 end
     

@@ -1,4 +1,9 @@
 function [dn, millis] = dbdate2datenum(dbdate)
+if (numel(dbdate) == 0)
+    dn = [];
+    millis = [];
+    return;
+end
 dbdate=convertStringsToChars(dbdate);
 
 % function dn = dbdate2datenum(dbdate)
