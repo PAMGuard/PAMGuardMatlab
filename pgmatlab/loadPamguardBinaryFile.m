@@ -198,7 +198,7 @@ try
                         fileInfo.objectType=2000;
                         fileInfo.readModuleHeader=@readWMDHeader;
                         fileInfo.readModuleData=@readWMDData;
-                        fileInfo.readBackgroundData = @readSpectralBackground
+                        fileInfo.readBackgroundData = @readSpectralBackground;
 
                     case {'Energy Sum Detector','Spectrogram Correlation Detector','Matched Filter Detector'}
                         switch fileInfo.fileHeader.streamName
