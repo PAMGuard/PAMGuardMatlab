@@ -55,5 +55,9 @@ catch
     javaaddpath(jarFile);
 end
 
+% check dbName is char, not string
+if isstring(fn)
+    fn = char(fn);
+end
 % now open the database.
 con = database('','','',driver, [protocol fn]);
