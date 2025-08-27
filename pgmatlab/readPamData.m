@@ -205,7 +205,11 @@ try
             fseek(fid, nextObj, 'bof');
         end
     else
-        if(isa(fileInfo.readModuleData,'function_handle'))
+        if isfield(fileInfo, 'readModuleData') == 0
+            disp('readModuleData function is not implemented for this file');
+            fseek(fid, nextObj, 'bof');
+            return;
+        elseif(isa(fileInfo.readModuleData,'function_handle'))
             [data, error] = fileInfo.readModuleData(fid, fileInfo, data);
             if (error)
                 disp(['Error - cannot retrieve ' fileInfo.fileHeader.moduleType ' data properly.']);

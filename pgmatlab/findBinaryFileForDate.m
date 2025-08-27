@@ -6,9 +6,14 @@ if nargin < 4
 end
 if numel(dates) > 1
     filePath = cell(size(dates));
+    mt = zeros(size(dates));
     for i = 1:numel(dates)
         filePath{i} = findBinaryFileForDate(root, mask, dates(i), verbose);
+        mt(i) = isempty(filePath{i});
     end
+    % remove nulls
+    filePath = filePath(find(mt==0));
+
     return
 end
 % from here it's only a single date. 
