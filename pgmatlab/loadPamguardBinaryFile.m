@@ -39,6 +39,7 @@ timeRange = [-Inf +Inf];
 uidRange = [-Inf +Inf];
 uidList = [];
 iArg = 0;
+sorted = 0;
 filterfun = @passalldata;
 channelmap=-1;
 while iArg < numel(varargin)
@@ -60,6 +61,9 @@ while iArg < numel(varargin)
        case 'channel'
            iArg = iArg + 1;
            channelmap = varargin{iArg};
+        case 'sorted'
+            iArg = iArg + 1;
+            sorted = varargin{iArg};
    end          
 end
 selState = 0;
@@ -277,52 +281,55 @@ try
                 % datagram data  Skip it for now. 
                 fseek(fid, nextLen, 'cof');                
             otherwise
+
                 if (isempty(fileInfo.fileHeader))
                     disp('Error: found data before file header.  Aborting load');
                 end
 
                 [dataPoint, selState] = readPamData(fid, fileInfo, timeRange, uidRange, uidList);
-                if (selState == 2) 
+
+                % see if it's in the specified list of wanted UID's
+                if ~isempty(uidList)
+
+                    try 
+                        dataUID = dataPoint.UID;
+                        % if dataUID > uidList(end)
+                        %     break;
+                        % end
+
+                        selState = sum(dataUID == uidList);
+                    catch
+                        
+                    end
+                end
+                if channelmap>0 && channelmap~=dataPoint.channelMap
+                    selState = 0;
+                end
+
+                if selState == 1
+                    selState = filterfun(dataPoint);
+                end
+                if (selState == 0 || (selState == 2 && ~sorted))
+                    fseek(fid, prevPos+nextLen, 'bof');
+                    continue;
+                elseif (selState == 2 && sorted) 
                     break;
                 end
+
                 newP = ftell(fid);
                 pErr = newP - (prevPos+nextLen);
                 if pErr ~= 0
                     fprintf('Error in file position: %d bytes\n', pErr);
                     fseek(fid, -pErr, 'cof');
                 end
+
                 if nextType == -6
                     nBackground = nBackground + 1;
                     backgroundData(nBackground) = dataPoint;
                     continue;
                 end
                 
-                % see if it's in the specified list of wanted UID's
-                if ~isempty(uidList)
-                    try 
-                        dataUID = dataPoint.UID;
-                        % if dataUID > uidList(end)
-                        %     break;
-                        % end
-                        selState = sum(dataUID == uidList);
-                    catch
-                        
-                    end
-                end
-                
-                if channelmap>0 && channelmap~=dataPoint.channelMap
-                    continue;
-                end
 
-                if selState > 0
-                    selState = filterfun(dataPoint);
-                end
-                if (selState == 0)
-                    continue;
-                elseif (selState == 2) 
-                    break;
-                end
-                                                
                 % Preallocation. Acheived by adding new data points beyond
                 % the end of the existing array, then shortening the array
                 % before it is returned to the user.
@@ -331,9 +338,6 @@ try
                 dataSet(nData) = dataPoint;
                 
 %                 dataSet = [dataSet dataPoint];
-        end
-        if (selState == 2)
-            break;
         end
     end
     % due to preallocation it's likely the array is now far too large so

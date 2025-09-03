@@ -102,13 +102,13 @@ try
     if (version == 2 || (bitand(data.flagBitmap, CHANNELMAP)~=0) )
         data.channelMap = fread(fid,1,'int32');
     end
-    
+
     if (bitand(data.flagBitmap, UID)==UID)
         data.UID = fread(fid,1,'int64');
         if (data.UID < uidRange(1))
             selState = 0;
-        % elseif (data.UID > uidRange(2))
-        %     selState = 2;
+        elseif (data.UID > uidRange(2))
+            selState = 2;
         end
     end
     
@@ -180,6 +180,7 @@ try
 
     if (selState == 2) 
         % no need to read any more
+        fseek(fid, nextObj, 'bof');
         return;
     end
     if (selState == 0)
@@ -187,7 +188,7 @@ try
         fseek(fid, nextObj, 'bof');
         return;
     end
-    
+
     % now read the module-specific data
     if isBackground
         hasBgndReader = sum(strcmp(fields(fileInfo),'readBackgroundData'));
@@ -205,11 +206,7 @@ try
             fseek(fid, nextObj, 'bof');
         end
     else
-        if isfield(fileInfo, 'readModuleData') == 0
-            disp('readModuleData function is not implemented for this file');
-            fseek(fid, nextObj, 'bof');
-            return;
-        elseif(isa(fileInfo.readModuleData,'function_handle'))
+        if(isa(fileInfo.readModuleData,'function_handle'))
             [data, error] = fileInfo.readModuleData(fid, fileInfo, data);
             if (error)
                 disp(['Error - cannot retrieve ' fileInfo.fileHeader.moduleType ' data properly.']);
@@ -218,6 +215,7 @@ try
             end
         end
     end
+
     % now check to see if there are standard annotations to the main data.
     if (bitand(data.flagBitmap, HASBINARYANNOTATIONS)~=0)
         
