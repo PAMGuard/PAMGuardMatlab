@@ -5,7 +5,7 @@ dbName = 'C:\ProjectData\RobRiver\Y4_2023_2024_offline\RobRiver_Yr4_annotationsR
 tableName = 'Auto_Seal'
 colName = 'UID'
 con = sqlite(dbName)
-tableExists(con, tableName)
+pgmatlab.db.tableExists(con, tableName)
 
 % pStr = sprintf('PRAGMA table_Info(''%s'')', tableName);
 % con.fetch(pStr)
@@ -13,7 +13,7 @@ tableExists(con, tableName)
 sq = sprintf('SELECT * FROM sqlite_master where name=''%s''', tableName);
 con.fetch(sq)
 
-columnExists(con, tableName, colName)
+pgmatlab.db.columnExists(con, tableName, colName)
 
 close(con)
 

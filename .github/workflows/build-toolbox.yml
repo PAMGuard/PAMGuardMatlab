@@ -1,0 +1,35 @@
+name: Build MATLAB Toolbox
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set MATLAB version
+        uses: matlab-actions/setup-matlab@v1
+        with:
+          release: 'R2025a'
+
+      - name: Determine toolbox version
+        id: version
+        run: |
+          # Remove leading 'v' from git tag
+          echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+
+      - name: Build toolbox
+        run: |
+          matlab -batch "
+          opts = matlab.addons.toolbox.ToolboxOptions('pgmatlab_toolbox.prj');
+          opts.ToolboxVersion = getenv('VERSION');
+          matlab.addons.toolbox.packageToolbox(opts, sprintf('pgmatlab_%s.mltbx', getenv('VERSION')));"
+          
+      - name: Attach to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+            files: "pgmatlab_*.mltbx"
