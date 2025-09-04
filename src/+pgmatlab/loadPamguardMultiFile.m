@@ -35,12 +35,12 @@ for i = 1:numel(unFiles) % loop over the different files
         fprintf('Loading file %s %d of %d\n', fileName, i, numel(unFiles));
     end
 
-    filePath = findBinaryFile(dataDir,'*.pgdf',unFiles{i});
+    filePath = pgmatlab.findBinaryFile(dataDir,'*.pgdf',unFiles{i});
 
     % list of clicks in a particular file
     fileUIDs = itemUID(find(strcmp(fileNames, unFiles{i})));
 
-    fileData = loadPamguardBinaryFile(filePath, 'uidlist', fileUIDs);
+    fileData = pgmatlab.loadPamguardBinaryFile(filePath, 'uidlist', fileUIDs);
     % add the file information to all data loaded. 
     [~,fName,fEnd] = fileparts(filePath);
     fileName = [fName fEnd];

@@ -8,7 +8,7 @@ if numel(dates) > 1
     filePath = cell(size(dates));
     mt = zeros(size(dates));
     for i = 1:numel(dates)
-        filePath{i} = findBinaryFileForDate(root, mask, dates(i), verbose);
+        filePath{i} = pgmatlab.findBinaryFileForDate(root, mask, dates(i), verbose);
         mt(i) = isempty(filePath{i});
     end
     % remove nulls
@@ -25,7 +25,7 @@ if needFullSearch(lastRoot, lastMask, root, mask)
     if (verbose)
         fprintf('Searching folder %s for files type %s\n', root, mask);
     end
-    masterList = dirsub(root, mask);
+    masterList = pgmatlab.utils.dirsub(root, mask);
     namesOnly = cell(1,numel(masterList));
     shortenedNames = cell(1,numel(masterList));
     dataStarts = zeros(1,numel(masterList));
@@ -38,7 +38,7 @@ if needFullSearch(lastRoot, lastMask, root, mask)
             end
         end
         xFile = strrep(masterList(i).name, '.pgdf', '.pgdx');
-        [~, fileInfo] = loadPamguardBinaryFile(xFile);
+        [~, fileInfo] = pgmatlab.loadPamguardBinaryFile(xFile);
         try
             dataStarts(i) = fileInfo.fileHeader.dataDate;
             dataEnds(i) = fileInfo.fileFooter.dataDate;

@@ -215,7 +215,7 @@ classdef StandardModule < pgmatlab.core.standard.BaseChunk
                         case 'ClickClasssifier_1'
                             anObj = pgmatlab.core.annotations.ClickClsFr();
                         case 'Matched_Clk_Clsfr'
-                            anObj = pgmatlab.core.annotations.MarchCls();
+                            anObj = pgmatlab.core.annotations.MatchCls();
                         case 'BCLS' 
                             anObj = pgmatlab.core.annotations.RWUDP();
                         case {'DLRE', 'Delt'}

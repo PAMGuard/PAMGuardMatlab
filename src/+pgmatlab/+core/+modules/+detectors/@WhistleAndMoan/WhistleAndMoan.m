@@ -22,8 +22,8 @@ classdef WhistleAndMoan < pgmatlab.core.standard.StandardModule
             if (fileInfo.moduleHeader.version == 1)
                 data.nDelays = fread(fid, 1, 'int8');
                 data.delays = fread(fid, data.nDelays, 'int16'); % need to scale this still !!!!
-                if ~isempty(moduleHeader)
-                    data.delays = data.delays / moduleHeader.delayScale;
+                if ~isempty(fileInfo.moduleHeader)
+                    data.delays = data.delays / fileInfo.moduleHeader.delayScale;
                 end
             end
             

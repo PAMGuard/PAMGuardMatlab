@@ -12,11 +12,11 @@ if (nargin < 3)
     verbose = 0;
 end
 if nargin < 4
-    filterfun = @passalldata;
+    filterfun = @pgmatlab.utils.passalldata;
 end
 data = [];
 background = [];
-d = dirsub(dir, fileMask);
+d = pgmatlab.utils.dirsub(dir, fileMask);
 for i = 1:numel(d)
     if verbose
         if mod(i, verbose) == 0
@@ -25,7 +25,7 @@ for i = 1:numel(d)
     end
     [fRoot, fName, fEnd] = fileparts(d(i).name);
     fileNameOnly = [fName fEnd];
-    [dat fInf] = loadPamguardBinaryFile(d(i).name, 'filter', filterfun);
+    [dat fInf] = pgmatlab.loadPamguardBinaryFile(d(i).name, 'filter', filterfun);
     if ~isempty(dat)
         % need to add bookkeeping data to dat so that we know which file
         % each click comes from and also know which click it is within the

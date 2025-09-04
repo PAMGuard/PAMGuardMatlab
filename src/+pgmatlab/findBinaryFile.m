@@ -6,7 +6,7 @@ persistent lastRoot lastMask;
 persistent masterList namesOnly shortenedNames;
 if needFullSearch(lastRoot, lastMask, root, mask)
     maxNameLen = 80; % problem in database limiting names to 80 characters
-    masterList = dirsub(root, mask);
+    masterList = pgmatlab.utils.dirsub(root, mask);
     namesOnly = cell(1,numel(masterList));
     shortenedNames = cell(1,numel(masterList));
 

@@ -3,9 +3,7 @@ classdef SpermWhaleIPI < pgmatlab.core.standard.StandardModule
         objectType = 0;
     end
     methods
-        function obj = SpermWhaleIPI();
-            obj.background = @SpermWhaleIPIBackground;
-        end
+        function obj = SpermWhaleIPI(); end
         function [data, selState] = readImpl(~, fid, data, fileInfo, length, identifier, selState);
 
             data.parentUID = fread(fid, 1, 'int64');            % 8

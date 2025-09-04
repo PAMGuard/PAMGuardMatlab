@@ -90,7 +90,7 @@ uidRange = [-Inf +Inf];
 uidList = [];
 iArg = 0;
 sorted = 0;
-filterfun = @passalldata;
+filterfun = @pgmatlab.utils.passalldata;
 channelmap=-1;
 while iArg < numel(varargin)
     iArg = iArg + 1;
