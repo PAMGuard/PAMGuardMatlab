@@ -26,7 +26,7 @@ classdef StandardModule < pgmatlab.core.standard.BaseChunk
 
     methods (Access = public, Sealed)
         function obj = StandardModule(); end
-        function [data, selState] = read(obj, fid, data, fileInfo, length, identifier, timeRange, uidRange, uidList) 
+        function [data, selState] = read(obj, fid, data, fileInfo, length, identifier, timeRange, uidRange, uidList, channelMap) 
             import pgmatlab.*;
             isBackground = identifier == -6;
             
@@ -96,6 +96,11 @@ classdef StandardModule < pgmatlab.core.standard.BaseChunk
             end
             if (fileVersion == 2 || (bitand(data.flagBitmap, flags.CHANNELMAP) ~= 0) )
                 data.channelMap = fread(fid, 1, 'int32');
+                % Filter by channel
+                if channelMap > 0 && channelMap ~= data.channelMap
+                    selState = 0;
+                    return;
+                end
             end
 
             % what's going on here? == UID?

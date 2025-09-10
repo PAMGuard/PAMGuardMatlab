@@ -1,4 +1,4 @@
-function [dataSet, fileInfo] = loadPamguardBinaryFile(fileName, varargin)
+function [dataSet, fileInfo, selState] = loadPamguardBinaryFile(fileName, varargin)
 %PGMATLAB.LOADPAMGUARDBINARYFILE - Load a <a href="https://www.pamguard.org/olhelp/utilities/BinaryStore/docs/binarystore_overview.html">PAMGuard Binary File</a> into memory.
 %   Produces a 1x2 vector with structs of the data set and file information.
 %
@@ -74,7 +74,7 @@ function [dataSet, fileInfo] = loadPamguardBinaryFile(fileName, varargin)
 %       >>> end
 %       >>> [d,f] = pgmatlab.loadPamguardBinaryFile("./data.pgdf", 'filter', @myFilter, 'sorted', 1)
 %
-%   See also PGMATLAB.LOADPAMGUARDBINARYFOLDER, PGMATLAB.LOADPAMGUARDMULTIFILE
+%   See also PGMATLAB.LOADPAMGUARDBINARYFOLDER, PGMATLAB.LOADPAMGUARDMULTIFILE.
 %
 
 import pgmatlab.utils.*;
@@ -308,16 +308,11 @@ try
                 dataPoint = struct();
 
                 try
-                    [dataPoint, selState] = moduleObj.read(fid, dataPoint, fileInfo, length, identifier, timeRange, uidRange, uidList);
+                    [dataPoint, selState] = moduleObj.read(fid, dataPoint, fileInfo, length, identifier, timeRange, uidRange, uidList, channelmap);
                 catch mError
                     disp(['Error reading ' fileInfo.fileHeader.moduleType '  data object.  Data read:']);
                     disp(dataPoint);
                     disp(getReport(mError));
-                end
-
-                % Filter by channel
-                if channelmap > 0 && channelmap ~= dataPoint.channelMap
-                    selState = 0;
                 end
 
                 % Allow custom filters to be applied
@@ -332,6 +327,9 @@ try
                 if (selState == 2 && sorted)
                     break;
                 elseif (selState ~= 1)
+                    if (~sorted)
+                        selState = 0;
+                    end
                     fseek(fid, nextPos - ftell(fid), 'cof');
                     continue;
                 end
@@ -339,11 +337,11 @@ try
                 % add to the data or background variables accordingly
                 if isBackground
                     nBackground = nBackground + 1;
-                    background = checkArrayAllocation(background, nBackground, dataPoint);
+                    background = pgmatlab.utils.checkArrayAllocation(background, nBackground, dataPoint);
                     background(nBackground) = dataPoint;
                 else
                     nData = nData + 1;
-                    dataSet = checkArrayAllocation(dataSet, nData, dataPoint);
+                    dataSet = pgmatlab.utils.checkArrayAllocation(dataSet, nData, dataPoint);
                     dataSet(nData) = dataPoint;
                 end
 
@@ -376,26 +374,5 @@ try
     fclose(fid);
 catch
 end
-return;
-end
-
-
-% Check the array allocation. This gets called every time data are read and
-% will extend the array by approximately the sqrt of the arrays own length
-% if required. Preallocation acheived by sticking a sample object at a high
-% data index so that array up to that point gets filled with nulls.
-function array = checkArrayAllocation(array, reqLength, sampleObject)
-if isempty(array)
-    currentLength = 0;
-    clear array;
-else
-    currentLength = numel(array);
-end
-if (currentLength >= reqLength)
-    return;
-end
-allocStep = round(sqrt(reqLength));
-allocStep = max(10, min(allocStep, 10000));
-array(reqLength + allocStep) = sampleObject;
 return;
 end
