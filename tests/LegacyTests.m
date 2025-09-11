@@ -4,7 +4,7 @@
 classdef LegacyTests < matlab.unittest.TestCase
     properties
         testsFolder = 'tests'; % inside root
-        resourcesFolder = 'resources'; % inside root
+        resourcesFolder = 'testing-resources'; % inside root
             dataFolder = 'data'; % inside resources
             legacyFolder = 'v1.0.1code'; % inside resources
         codeFolder = 'src'; % inside root
