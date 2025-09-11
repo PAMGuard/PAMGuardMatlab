@@ -22,10 +22,18 @@ function eventData = loadPamguardMultiFile(dir, fileNames, UIDs, verbose)
 %           more information on how these arrays interact with each other.
 %
 %   Example 1: Load sample event
-%       fileNames = 
+%       fileNames = {'file1.pgdf', 'file2.pgdf'];
+%       uids = [500001, 500002];
+%       pgmatlab.loadPamguardMultiFile('./path/to/dir', fileNames, uids);
+%
+%   Example 2: Load sample event with logging verbosity
+%       fileNames = {'file1.pgdf', 'file2.pgdf'];
+%       uids = [500001, 500002];
+%       pgmatlab.loadPamguardMultiFile('./path/to/dir', fileNames, uids, 1);
 %
 
 eventData = [];
+nEvents = 0;
 if nargin < 4
     verbose = 0;
 end
@@ -33,8 +41,7 @@ end
 % find the files we need using the findBinaryFile function. 
 % unique file list
 unFiles = unique(fileNames);
-for i = 1:numel(unFiles) % loop over the different files
-
+for i = 1:numel(unFiles)
     if (verbose)
         fileName = unFiles{i};
         if length(dir) < length(fileName)
@@ -42,24 +49,41 @@ for i = 1:numel(unFiles) % loop over the different files
         end
         fprintf('Loading file %s %d of %d\n', fileName, i, numel(unFiles));
     end
-
-    disp("Un files: " + unFiles{i})
+    
     filePath = pgmatlab.findBinaryFile(dir,'*.pgdf',unFiles{i});
-    disp("File path: " + unFiles{i});
-    disp("I GOT HERE");
-    disp(filePath);
-
+    % Ensure the file exists
+    if ~exist(filePath, 'file')
+        fprintf(' - Unable to find file %s\n', unFiles{i});
+        continue;
+    end
+    
     % list of clicks in a particular file
-    fileUIDs = UIDs(find(strcmp(fileNames, unFiles{i})));
+    mask = strcmp(fileNames, unFiles{i});
+    fileUIDs = UIDs(mask);
 
     fileData = pgmatlab.loadPamguardBinaryFile(filePath, 'uidlist', fileUIDs);
-    % add the file information to all data loaded. 
+    
+    % Do some validation checks. Warn user if no (or not enough) data is found.
+    if isempty(fileData)
+        fprintf(' - No data found for file "%s" matching UIDs [%s]\n', unFiles{i}, sprintf('%d, ', fileUIDs));
+        continue;
+    end
+    if length(fileData) ~= length(fileUIDs)
+        fprintf(' - Only %d/%d data points found for file "%s" matching UIDs [%s]\n', length(fileData), length(fileUIDs), unFiles{i}, sprintf('%d, ', fileUIDs));
+    end
+    
+    % Add the file information to all data loaded. 
     [~,fName,fEnd] = fileparts(filePath);
     fileName = [fName fEnd];
     for d = 1:numel(fileData)
         fileData(d).binaryFile = fileName;
     end
 
-    eventData = [eventData fileData];
+    % Preallocate eventData (performance)
+    eventData = pgmatlab.utils.checkArrayAllocation(eventData, numel(eventData) + numel(fileData), fileData(1));
+    nEvents = nEvents + numel(fileData);
+    eventData(end-numel(fileData)+1:end) = fileData;
 end
-
+% Cut short preallocated eventData to the correct size
+eventData = eventData(1:nEvents);
+end
