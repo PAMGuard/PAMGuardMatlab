@@ -1,4 +1,4 @@
-function [allData, allBackground, fileInfos] = loadPamguardBinaryFolder(dir, fileMask, verbose, filterfun, varargin)
+function [allData, allBackground, fileInfos] = loadPamguardBinaryFolder(dir, fileMask, verbose, varargin)
 %PGMATLAB.LOADPAMGUARDBINARYFOLDER - Load many <a href="https://www.pam
 %   guard.org/olhelp/utilities/BinaryStore/docs/binarystore_overview.ht
 %   ml">PAMGuard Binary Files</a> into memory from a folder (and subfol
@@ -8,9 +8,9 @@ function [allData, allBackground, fileInfos] = loadPamguardBinaryFolder(dir, fil
 %   from all of the files in the folder.
 %
 %   Syntax:
-%       [allData, allBackground, fileInfos] = PGMATLAB.LOADPAMGUARDBINARYFOLDER(dir, fileMask, verbose, filterfun, varargin)
-%       [allData, allBackground] = PGMATLAB.LOADPAMGUARDBINARYFOLDER(dir, fileMask, verbose, filterfun, varargin)
-%       allData = PGMATLAB.LOADPAMGUARDBINARYFOLDER(dir, fileMask, verbose, filterfun, varargin)
+%       [allData, allBackground, fileInfos] = PGMATLAB.LOADPAMGUARDBINARYFOLDER(dir, fileMask, verbose, varargin)
+%       [allData, allBackground] = PGMATLAB.LOADPAMGUARDBINARYFOLDER(dir, fileMask, verbose, varargin)
+%       allData = PGMATLAB.LOADPAMGUARDBINARYFOLDER(dir, fileMask, verbose, varargin)
 %   
 %       - dir (string, required) is the root directory of the binary data files to be read.
 %       
@@ -18,12 +18,6 @@ function [allData, allBackground, fileInfos] = loadPamguardBinaryFolder(dir, fil
 %       
 %       - verbose (integer, default 0) if a non-zero number n then every n files prints a progress log.
 %           To avoid logging set verbose to 0.
-%       
-%       - filterfun (function, default 0) Specify a filter function to apply to the data.
-%           Must be a function handle that takes a data struct as input and
-%           returns a selection state (0 = skip, 1 = keep, 2 = stop, if data
-%           is ordered). If you want to bypass this variable, simply pass 0
-%           or an empty function handle.
 %
 %       - varargin (optional) can be one or more of the following options, used to filter data:
 %
@@ -38,6 +32,11 @@ function [allData, allBackground, fileInfos] = loadPamguardBinaryFolder(dir, fil
 %
 %           'channel', CHANNEL_MAP (default ALL): Specify a channel map to apply to the data.
 %               CHANNEL_MAP a bitmap of the channels to load.
+%
+%           'filter', FILTER_FUN: Specify a filter function to apply to the data.
+%               FILTER_FUN is a function handle that takes the data as input and
+%               returns a selection state (0 = skip, 1 = keep, 2 = stop, if data
+%               is ordered).
 %
 %           'sorted', SORTED (default 0): Specify whether the data is sorted. SORTED is a 
 %               logical value (1 true or 0 false). It serves to speed up execution
@@ -83,13 +82,13 @@ if iArg == 0
     varargin = {};
 end
 
-% Manually add filter to the varargin. This is to
-% support legacy code, and should be discouraged.
-if nargin < 4 || (nargin >= 4 && ~filterfun)
-    filterfun = @pgmatlab.utils.passalldata;
-end
-varargin{iArg + 1} = "filter";
-varargin{iArg + 2} = filterfun;
+% % Manually add filter to the varargin. This is to
+% % support legacy code, and should be discouraged.
+% if nargin < 4 || (nargin >= 4 && ~filterfun)
+%     filterfun = @pgmatlab.utils.passalldata;
+% end
+% varargin{iArg + 1} = "filter";
+% varargin{iArg + 2} = filterfun;
 
 allData = [];
 nData = 0;

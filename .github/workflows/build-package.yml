@@ -22,7 +22,7 @@ jobs:
 
     - name: Zip code to distribute
       run: |
-        zip -r "pgmatlab-${{ github.event.release.tag_name }}.zip" src/* LICENSE README.md
+        zip -r "pgmatlab-${{ github.event.release.tag_name }}.zip" pgmatlab/* LICENSE README.md
 
     - name: Upload code to distribute
       uses: actions/upload-artifact@v4

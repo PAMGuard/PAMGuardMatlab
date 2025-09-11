@@ -1,4 +1,6 @@
 function filePath = findBinaryFileForDate(root, mask, dates, verbose)
+root = pgmatlab.utils.charArray(root);
+mask = pgmatlab.utils.charArray(mask);
 % find a file in the root that has data in the dates range. if necessary
 % dates may be a vector and multiple files may be returned. 
 if nargin < 4

@@ -17,7 +17,7 @@ function eventData = loadPamguardMultiFile(dir, fileNames, UIDs, verbose)
 %       - dir (string, required): the root directory in which to search for
 %           PAMGuard binary files (.pgdf).
 %
-%       - fileNames (array) and UIDs (array): two parallel arrays specifying
+%       - fileNames (cell {}) and UIDs (array []): two parallel arrays specifying
 %           specific UIDs in each file to load into eventData. See Examples for
 %           more information on how these arrays interact with each other. These
 %           arrays must have the same number of elements.
@@ -26,15 +26,21 @@ function eventData = loadPamguardMultiFile(dir, fileNames, UIDs, verbose)
 %           files prints a progress log. To avoid logging set verbose to 0.
 %
 %   Example 1: Load sample event
-%       fileNames = {'file1.pgdf', 'file2.pgdf'];
+%       fileNames = {'file1.pgdf', 'file2.pgdf'};
 %       uids = [500001, 500002];
 %       pgmatlab.loadPamguardMultiFile('./path/to/dir', fileNames, uids);
 %
 %   Example 2: Load sample event with logging verbosity
-%       fileNames = {'file1.pgdf', 'file2.pgdf'];
+%       fileNames = {'file1.pgdf', 'file2.pgdf'};
 %       uids = [500001, 500002];
 %       pgmatlab.loadPamguardMultiFile('./path/to/dir', fileNames, uids, 1);
 %
+
+dir = pgmatlab.utils.charArray(dir);
+fileNames = pgmatlab.utils.charArray(fileNames);
+if iscell(UIDs)
+    UIDs = cell2mat(UIDs);
+end
 
 eventData = [];
 nEvents = 0;
@@ -58,7 +64,7 @@ for i = 1:numel(unFiles)
         fprintf('Loading file %s %d of %d\n', fileName, i, numel(unFiles));
     end
     
-    filePath = pgmatlab.findBinaryFile(dir,'*.pgdf',unFiles{i});
+    filePath = pgmatlab.utils.findBinaryFile(dir,'*.pgdf',unFiles{i});
     % Ensure the file exists
     if ~exist(filePath, 'file')
         fprintf(' - Unable to find file %s\n', unFiles{i});
