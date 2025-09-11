@@ -19,7 +19,11 @@ function eventData = loadPamguardMultiFile(dir, fileNames, UIDs, verbose)
 %
 %       - fileNames (array) and UIDs (array): two parallel arrays specifying
 %           specific UIDs in each file to load into eventData. See Examples for
-%           more information on how these arrays interact with each other.
+%           more information on how these arrays interact with each other. These
+%           arrays must have the same number of elements.
+%
+%       - verbose (integer, default 0): if a non-zero number n then every n
+%           files prints a progress log. To avoid logging set verbose to 0.
 %
 %   Example 1: Load sample event
 %       fileNames = {'file1.pgdf', 'file2.pgdf'];
@@ -36,6 +40,10 @@ eventData = [];
 nEvents = 0;
 if nargin < 4
     verbose = 0;
+end
+
+if numel(fileNames) ~= numel(UIDs)
+    error('fileNames and UIDs must have the same number of elements.');
 end
 
 % find the files we need using the findBinaryFile function. 
@@ -80,9 +88,13 @@ for i = 1:numel(unFiles)
     end
 
     % Preallocate eventData (performance)
-    eventData = pgmatlab.utils.checkArrayAllocation(eventData, numel(eventData) + numel(fileData), fileData(1));
+    if isempty(eventData)
+        eventData = fileData;
+    else
+        eventData = pgmatlab.utils.checkArrayAllocation(eventData, numel(eventData) + numel(fileData), fileData(1));
+        eventData(end-numel(fileData)+1:end) = fileData;
+    end
     nEvents = nEvents + numel(fileData);
-    eventData(end-numel(fileData)+1:end) = fileData;
 end
 % Cut short preallocated eventData to the correct size
 eventData = eventData(1:nEvents);
