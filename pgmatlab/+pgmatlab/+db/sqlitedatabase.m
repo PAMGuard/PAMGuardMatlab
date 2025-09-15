@@ -4,7 +4,7 @@ function con = sqlitedatabase(fn, create)
 %   fn: the path (filename) of a SQLite database file.
 %   create: if true, create an empty database. If false, return null
 %
-%
+
 % to use this function you will need to first download the sqlite-jdbc
 % interface version sqlite-jdbc-3.36.0.jar or later. This is currently
 % available from https://github.com/xerial/sqlite-jdbc/releases.
@@ -50,7 +50,8 @@ catch
     % this will always happen the first time the function is called. 
     % driverClassPath = 'sqlite-jdbc-3.36.0.jar';
     % 3.45.3.0 is the current PAMGuard version as of V2.02.17, August 2025
-    driverClassPath = 'sqlite-jdbc-3.45.3.0.jar';
+    % driverClassPath = 'sqlite-jdbc-3.45.3.0.jar';
+    driverClassPath = '+pgmatlab/+db/sqlite-jdbc-3.45.3.0.jar';
     jarFile = which(driverClassPath);
     javaaddpath(jarFile);
 end

@@ -1,5 +1,5 @@
 function n = writespectrogramannotationdata(dbName, tableName, data, exColNames, exColTypes)
-% finally getting around to making a nice function to write data into a
+% a nice one stop function to write data into a
 % PAMGuard spectrogram annotations table. Well, not nice, but at least
 % reusable.
 colNames = {'Id', 'UID', 'UTC', 'UTCMilliseconds', 'PCLocalTime', 'PCTime', 'ChannelBitmap',...
@@ -11,13 +11,10 @@ if nargin >= 5
     colTypes = [colTypes, exColTypes];
 end
 con = sqlite(dbName);
-checkTable(con, tableName, true);
-for i = 1:numel(colNames)
-    checkColumn(con, tableName, colNames{i}, colTypes{i});
-end
+pgmatlab.db.checkTable(con, tableName, true, colNames, colTypes);
 
-maxId = getmaxcolvalue(con, tableName, 'Id');
-maxUID = getmaxcolvalue(con, tableName, 'UID');
+maxId = pgmatlab.db.getmaxcolvalue(con, tableName, 'Id');
+maxUID = pgmatlab.db.getmaxcolvalue(con, tableName, 'UID');
 if isempty(maxId)
     maxId = 0;
 end

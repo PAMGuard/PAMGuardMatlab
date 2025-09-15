@@ -15,6 +15,16 @@ A MATLAB library for loading PAMGuard binary files containing acoustic detection
 addpath('path/to/extracted/pgmatlab');
 ```
 
+5. You only need to add the one pgmatlab folder to your path to use the main PAMGuard binary file functions. 
+However, if you're using any of the utility and database functions directly within your own code, 
+you'll need to either import the namespaces, import individual functions from within the namespaces, 
+or put the full namespace path in every function call:
+ 
+```matlab
+import pgmatlab.utils.*; % import PAMGuard utils functions 
+import pgmatlab.db.*; % import PAMGuard database functions
+```
+
 ## Quick Start
 
 Load a single binary file:
@@ -146,31 +156,7 @@ uids = [500001, 500123];
 eventData = loadPamguardMultiFile('./Data', files, uids, 1);
 ```
 
-## Utility Functions
 
-### Channel Map Functions
-
-Convert channel lists to bitmaps:
-```matlab
-function channelMap = makeChannelMap(channels)
-    channelMap = 0;
-    for i = 1:length(channels)
-        channelMap = channelMap + bitshift(1, channels(i));
-    end
-end
-```
-
-Extract channels from bitmap:
-```matlab
-channels = getChannels(channelMap);
-```
-
-### Time Conversion
-
-Convert milliseconds to MATLAB datenum:
-```matlab
-matlabTime = pgmatlab.utils.millisToDateNum(milliseconds);
-```
 
 ## Supported Modules
 
@@ -203,6 +189,95 @@ PAMGuardMatlab supports the following PAMGuard modules:
 2. **Specify file masks** when loading folders to avoid processing unnecessary files
 3. **Use filters** to reduce memory usage for large datasets
 4. **Load specific channels** rather than all channels when possible
+
+## Utility Functions
+
+To use the functions in +utils you will need to import that folder in every
+function that uses this library
+```matlab
+import pgmatlab.utils.*
+```
+
+### Channel Map Functions
+
+Convert channel lists to bitmaps:
+```matlab
+function channelMap = makeChannelMap(channels)
+    channelMap = 0;
+    for i = 1:length(channels)
+        channelMap = channelMap + bitshift(1, channels(i));
+    end
+end
+```
+
+Extract channels from bitmap:
+```matlab
+import pgmatlab.utils.*
+channels = getChannels(channelMap);
+```
+
+### Time Conversion
+
+Convert milliseconds to MATLAB datenum:
+```matlab
+matlabTime = pgmatlab.utils.millisToDateNum(milliseconds);
+```
+
+## Database Functions
+
+To use the functions in +db you will need to import that folder in every
+function that uses this library
+```matlab
+import pgmatlab.db.*
+```
+
+This folder contains an ad-hoc set of database functions written to support our own research. They 
+are not directly associated with reading binary files, but can be a useful companion to 
+the binary file functions. 
+
+### Getting a database connection
+
+If you're using the PAMGuard sqlite database, Matlab provide a built in function to open sqlite 
+database files
+```matlab
+conn = sqlite(dbfile,mode)
+```
+However, we've found that queries using connections from the sqlite function fail when any columms
+contain null data. Therefore, to read data from a PAMGuard database, we recommend using our own
+function
+```matlab
+import pgmatlab.db.*
+conn = sqlitedatabase(dbfile)
+```
+which uses a different library that supports null data. 
+
+**HOWEVER !!!**
+
+We've also found that the the sqlite function is slightly better at writing data than 
+sqlitedatabase. In particular, when writing TIMESTAMPS to a databsae, sqlitedatabase seems
+to convert times to long integer times in milliseconds, whereas a database opened with the sqlite
+function will write them correctly in a human readable date format. 
+
+So yes: Use sqlitedatabase to read from a PAMGuard database, and sqlite to write to one. 
+
+### Database Timestamp conversion
+
+Timestamps are usually returned in a String or char array format. Use the dbdate2datenum function
+to convert these data to Matlab dates
+
+```matlab
+import pgmatlab.utils.*
+import pgmatlab.db.*
+dbFile = './mydata/somedatabse.sqlite3';
+conn = sqlitedatabase(dbFile);
+data = conn.fetch('SELECT * FROM Sometableorother');
+matlabDates = dbdate2datenum(data.UTC);
+```
+
+Although Matlab now supports a more advanced date handling functions using datetime arrays, 
+we've found that the performance of these is poor and are currently sticking with the simple 
+numeric dates, which are the number of days that have elapsed since '00-Jan-0000'.
+
 
 ## Compatibility
 

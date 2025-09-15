@@ -6,7 +6,7 @@ if iscell(errorString)
     % handle multiple strings
     n = numel(errorString);
     for i = n:-1:1
-        e = unpackLocaliserError(errorString{i});
+        e = pgmatlab.db.unpackLocaliserError(errorString{i});
         if ~isempty(e)
             error(i) = e;
         else 
