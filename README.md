@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16979862.svg)](https://doi.org/10.5281/zenodo.16979862)
 
-A MATLAB library for loading PAMGuard binary files containing acoustic detection data including clicks, whistle contours, deep learning detections, noise measurements, and spectral data. PAMGuard binary files provide efficient data storage and fast access, but are not human-readable. This library allows you to import PAMGuard binary data directly into MATLAB.
+A MATLAB library for loading [PAMGuard binary files](https://www.pamguard.org/olhelp/utilities/BinaryStore/docs/binarystore_overview.html) containing acoustic detection data including clicks, whistle contours, deep learning detections, noise measurements, and spectral data. PAMGuard binary files provide efficient data storage and fast access, but are not human-readable. This library allows you to import PAMGuard binary data directly into MATLAB.
 
 ## Installation
 
