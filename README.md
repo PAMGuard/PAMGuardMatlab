@@ -15,7 +15,7 @@ A MATLAB library for loading [PAMGuard binary files](https://www.pamguard.org/ol
 addpath('path/to/extracted/pgmatlab');
 ```
 
-5. You only need to add the one pgmatlab folder to your path to use the main PAMGuard binary file functions. 
+You only need to add the one pgmatlab folder to your path to use the main PAMGuard binary file functions. 
 However, if you're using any of the utility and database functions directly within your own code, 
 you'll need to either import the namespaces, import individual functions from within the namespaces, 
 or put the full namespace path in every function call:
