@@ -187,6 +187,8 @@ try
                             case 'GPL Detections'
                                 fileInfo.readModuleData = @readGPLDetections;
                                 fileInfo.readBackgroundData = @readSpectralBackground;
+                            case 'GPL State'
+                                fileInfo.readModuleData = @readGPLStateData;
                         end
                     % Right Whale Edge Detector Module
                     case 'RW Edge Detector'
