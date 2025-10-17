@@ -40,6 +40,7 @@ if needFullSearch(lastRoot, lastMask, root, mask)
             end
         end
         xFile = strrep(masterList(i).name, '.pgdf', '.pgdx');
+        xFile = strrep(xFile, '.pgnf', '.pgdx');
         [~, fileInfo] = pgmatlab.loadPamguardBinaryFile(xFile);
         try
             dataStarts(i) = fileInfo.fileHeader.dataDate;
