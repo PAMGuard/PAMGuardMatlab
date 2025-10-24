@@ -3,7 +3,7 @@ function n = writespectrogramannotationdata(dbName, tableName, data, exColNames,
 % PAMGuard spectrogram annotations table. Well, not nice, but at least
 % reusable.
 colNames = {'Id', 'UID', 'UTC', 'UTCMilliseconds', 'PCLocalTime', 'PCTime', 'ChannelBitmap',...
-    'SequenceBitmap', 'Duration', 'f1', 'f2'}
+    'SequenceBitmap', 'Duration', 'f1', 'f2'};
 colTypes = {'INTEGER NOT NULL', 'INTEGER', 'TIMESTAMP', 'INTEGER', 'TIMESTAMP', 'TIMESTAMP', 'INTEGER',...
     'INTEGER', 'DOUBLE', 'DOUBLE', 'DOUBLE'};
 if nargin >= 5
@@ -35,13 +35,14 @@ elseif isstruct(data)
         maxUID = maxUID + 1;
         cData{i,1} = maxId;
         cData{i,2} = maxUID;
-        cData{i,3} = data(i).UTC;
-        if isnumeric(cData{i,3});
-            cData{i,3} = datenum2dbdate(cData{i,3}, '', true);
+        if isnumeric(data(i).UTC);
+            cData{i,3} = pgmatlab.utils.datenum2dbdate(data(i).UTC, '', true);
+        else
+            cData{i,3} = data(i).UTC;
         end
         cData{i,4} = 0;
         cData{i,5} = cData{i,3};
-        cData{i,6} = datenum2dbdate(now(), '', true);
+        cData{i,6} = pgmatlab.utils.datenum2dbdate(now(), '', true);
         cData{i,7} = data(i).ChannelBitmap;
         cData{i,8} = cData{i,7};
         cData{i,9} = data(i).Duration;
