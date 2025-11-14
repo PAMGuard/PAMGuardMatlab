@@ -1,7 +1,10 @@
 classdef UserForm < pgmatlab.core.standard.StandardAnnotation
+    properties
+        name = 'USerForm';
+    end
     methods
         function obj = UserForm(); end
-        function [data, selState] = read(obj, fid, data, fileInfo, anLength, anVersion); 
+        function [data, selState] = read(obj, fid, data, fileInfo, anLength, anVersion) 
             [data, selState] = read@pgmatlab.core.standard.StandardAnnotation(obj, fid, data, fileInfo, anLength, anVersion);
             
             % this is not quite right...

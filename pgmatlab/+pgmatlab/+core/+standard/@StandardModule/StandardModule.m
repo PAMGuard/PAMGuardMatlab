@@ -234,7 +234,7 @@ classdef StandardModule < pgmatlab.core.standard.BaseChunk
                     end
                     if ~isempty(anObj)
                         % Assign the result of anObj() to a dynamic field of anData.annotations
-                        d = anObj.read(fid, fileInfo, anLength, anVersion);
+                        d = anObj.read(fid, data, fileInfo, anLength, anVersion);
                         data.annotations.(anObj.name) = d;
                     end
                     anEndPos = ftell(fid);

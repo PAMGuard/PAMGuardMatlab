@@ -49,7 +49,8 @@ classdef DL < pgmatlab.core.standard.StandardAnnotation
 
     methods
         function obj = DL(); end
-        function [data, selState] = read(obj, fid, fileInfo, anLength, anVersion); 
+        function [data, selState] = read(obj, fid, data, fileInfo, anLength, anVersion)
+             
             nummodels = fread(fid, 1, 'int16'); % short in Java
 
             % disp(['Num models: ' num2str(nummodels)])

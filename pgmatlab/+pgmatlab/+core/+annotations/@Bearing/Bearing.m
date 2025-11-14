@@ -1,8 +1,11 @@
 
 classdef Bearing < pgmatlab.core.standard.StandardAnnotation
+    properties
+        name = "Bearing"
+    end
     methods
         function obj = Bearing(); end
-        function [data, selState] = read(obj, fid, data, fileInfo, anLength, anVersion); 
+        function [data, selState] = read(obj, fid, data, fileInfo, anLength, anVersion)
             [data, selState] = read@pgmatlab.core.standard.StandardAnnotation(obj, fid, data, fileInfo, anLength, anVersion);
             
             data.algorithmName = pgmatlab.utils.readJavaUTFString(fid);

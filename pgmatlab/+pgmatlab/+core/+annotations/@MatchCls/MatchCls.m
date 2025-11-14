@@ -1,7 +1,10 @@
 classdef MatchCls < pgmatlab.core.standard.StandardAnnotation
+    properties
+        name = 'MatchCls';
+    end
     methods
         function obj = MatchCls(); end
-        function [data, selState] = read(obj, fid, data, fileInfo, anLength, anVersion); 
+        function [data, selState] = read(obj, fid, data, fileInfo, anLength, anVersion) 
             [data, selState] = read@pgmatlab.core.standard.StandardAnnotation(obj, fid, data, fileInfo, anLength, anVersion);
             
             if (anVersion==1)

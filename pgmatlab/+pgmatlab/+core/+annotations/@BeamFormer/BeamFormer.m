@@ -1,5 +1,8 @@
 
 classdef BeamFormer < pgmatlab.core.standard.StandardAnnotation
+    properties
+        name = "BeamFormer"
+    end
     methods
         function obj = BeamFormer(); end
         function [data, selState] = read(obj, fid, data, fileInfo, anLength, anVersion); 
