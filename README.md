@@ -1,6 +1,6 @@
 # PAMGuardMatlab
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16979862.svg)](https://doi.org/10.5281/zenodo.16979862)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17641583.svg)](https://doi.org/10.5281/zenodo.17641583)
 
 PAMGuard binary files contains detections such as clicks, whistle contours, deep learning detections, noise, long term spectral averages etc. Binary files provide an efficient and very fast data management system but are not human readable. The `PAMGuard-MATLAB` library is a set of functions that allows the importing of PAMGuard binary files directly into MATLAB.
 
