@@ -222,6 +222,8 @@ try
                         switch fileInfo.fileHeader.streamName
                             case 'GPL Detections'
                                 moduleObj = pgmatlab.core.modules.detectors.GPL();
+                            case 'GPL State'
+                                moduleObj = pgmatlab.core.modules.detectors.GPLState();
                         end
 
                         % Right Whale Edge Detector Module
