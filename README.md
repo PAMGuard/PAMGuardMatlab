@@ -2,119 +2,307 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17641583.svg)](https://doi.org/10.5281/zenodo.17641583)
 
-PAMGuard binary files contains detections such as clicks, whistle contours, deep learning detections, noise, long term spectral averages etc. Binary files provide an efficient and very fast data management system but are not human readable. The `PAMGuard-MATLAB` library is a set of functions that allows the importing of PAMGuard binary files directly into MATLAB.
 
-### Installation
+A MATLAB library for loading [PAMGuard binary files](https://www.pamguard.org/olhelp/utilities/BinaryStore/docs/binarystore_overview.html) containing acoustic detection data including clicks, whistle contours, deep learning detections, noise measurements, and spectral data. PAMGuard binary files provide efficient data storage and fast access, but are not human-readable. This library allows you to import PAMGuard binary data directly into MATLAB.
 
-`PAMGuard-MATLAB` needs to be downloaded from here (or via a git client e.g. the integrated one in MATLAB) and added to you MATLAB path
+## Installation
 
-### Tutorial
-
-The core function of this library is `loadPamguardBinaryFile`. This loads any PAMGuard binary file, automatically figures out what type of data it contains and then imports the data into a struct with relevant field names. Usage is straightforward, simply point the function to the correct file. 
+1. Go to [GitHub Releases](https://github.com/PAMGuard/PAMGuardMatlab/releases)
+2. Download the latest `pgmatlab-{version}.zip` file
+3. Extract the ZIP file to your desired location
+4. Add the extracted `pgmatlab` folder to your MATLAB path:
 
 ```matlab
-binaryfile= './Files/SomeBinaryFile.pgdf'
-[binarydata, fileinfo]= loadPamguardBinaryFile(myBinaryFile)
+addpath('path/to/extracted/pgmatlab');
 ```
 
-`fileinfo` contains information about the binary file e.g. when it was created, what version of PAMGuard was used to process the data. `binarydata` is a struct with relevant field names. Some of these field names are consistent across different types of detections e.g. millis, date, UID and others are unique to the particular detection. 
-
-An example of the fields from a click detection are:
-
-**millis:** the start time of the click in milliseconds; this number can be
-converted to a date/time with millisecond accuracy.
-
-**date:** the start time of the click in MATLAB datenum format. Use datastr(date)
-to show a time string.
-
-**UID:**  a unique serial number for the
-detection. Within a processed dataset no other detection will have this number.
-
-**startSample:** The first sample of this click- often used for
-finer scale time delay measurements. Samples refers to the number of samples in
-total the sound card has taken since processing begun.
-
-**channelMap:** The channel map for this click. One number which
-represents which channels this click detection is from: To get the true
-channels use the *getChannels(channelMap)* function.
-
-**triggerMap:** which channel triggered the detection.
-
-**type:** Classification type. Must use database or settings to see what species
-this refers to.
-
-**duration:** Duration of this click detection in samples.
-
-**nChan:** Number of channels the
-detection was made on.
-
-**wave:** Waveform data for each channel.
-
-There are a few additional options for `loadPamguardBinaryFile`.
-
-Time ranges to load can be defined. 
-
+You only need to add the one pgmatlab folder to your path to use the main PAMGuard binary file functions. 
+However, if you're using any of the utility and database functions directly within your own code, 
+you'll need to either import the namespaces, import individual functions from within the namespaces, 
+or put the full namespace path in every function call:
+ 
 ```matlab
-timerange = [datenum('2020-03-19 20:00:00', 'yyyy-mm-dd HH:MM:SS'),...
- datenum('2020-03-19 21:00:00', 'yyyy-mm-dd HH:MM:SS')];
-[binarydata, fileinfo]= loadPamguardBinaryFile(myBinaryFile, 'timerange', timerange)
+import pgmatlab.utils.*; % import PAMGuard utils functions 
+import pgmatlab.db.*; % import PAMGuard database functions
 ```
 
-UID's are unique serial numbers for each detection. They are sequential and users can define values to load via. 
+## Quick Start
+
+Load a single binary file:
 
 ```matlab
-uids = 3456:8679;
-[binarydata, fileinfo]= loadPamguardBinaryFile(myBinaryFile, 'uidlist', uids)
+[data, fileInfo] = loadPamguardBinaryFile('path/to/file.pgdf');
 ```
 
-Some files can have multiple channel groups. Each channel group can contain one or more channels of data. To load detections with a specific channel map use. 
+Load multiple files from a folder:
 
 ```matlab
-channel = 3; %channel map
-[binarydata, fileinfo]= loadPamguardBinaryFile(myBinaryFile, 'channel', channel)
+data = loadPamguardBinaryFolder('path/to/folder', '*.pgdf');
 ```
 
-If you don't know the bitmap then you can create it using a list of channels via 
+Load specific data points across multiple files:
 
 ```matlab
-function [channelMap] = makeChannelList(channels)
-%MAKECHANNELLIST Make a channel bitmap from list. 
-%   [CHANNELMAP] = MAKECHANNELLIST(CHANNELS) makes a channel bitmap from a
-%   list of channels. Noted channel numbers are from zero, not one. 
+fileNames = {'file1.pgdf', 'file2.pgdf'};
+uids = [500001, 500002];
+eventData = loadPamguardMultiFile('path/to/folder', fileNames, uids);
+```
 
-channelMap=0;
-for i=1:length(channels)
-    channelMap = channelMap +  bitsll(1,channels(i));
+## Core Functions
+
+### `loadPamguardBinaryFile`
+
+The primary function for loading individual PAMGuard binary files. Automatically detects the data type and imports it into a structured format.
+
+**Syntax:**
+```matlab
+[data, fileInfo, selState] = loadPamguardBinaryFile(filename, ...)
+[data, fileInfo] = loadPamguardBinaryFile(filename, ...)
+data = loadPamguardBinaryFile(filename, ...)
+```
+
+**Parameters:**
+- `filename` - Path to the binary file
+- Optional name-value pairs:
+  - `'timerange', [startTime, endTime]` - Load data within time range
+  - `'uidrange', [startUID, endUID]` - Load data within UID range
+  - `'uidlist', [uid1, uid2, ...]` - Load specific UIDs
+  - `'channel', channelMap` - Load data from specific channels
+  - `'filter', @filterFunction` - Apply custom filter function
+  - `'sorted', true/false` - Optimize for sorted data (default: false)
+
+**Examples:**
+
+Load entire file:
+```matlab
+[data, fileInfo] = loadPamguardBinaryFile('detections.pgdf');
+```
+
+Load specific time range:
+```matlab
+startTime = datenum(2023,1,15,10,0,0);
+endTime = datenum(2023,1,15,11,0,0);
+[data, fileInfo] = loadPamguardBinaryFile('detections.pgdf', ...
+    'timerange', [startTime, endTime], 'sorted', true);
+```
+
+Load specific UIDs:
+```matlab
+[data, fileInfo] = loadPamguardBinaryFile('detections.pgdf', ...
+    'uidlist', [500001, 500005, 500010]);
+```
+
+Apply custom filter:
+```matlab
+function keep = myFilter(detection)
+    keep = detection.amplitude > 0.5;  % Keep high amplitude detections
 end
+
+[data, fileInfo] = loadPamguardBinaryFile('detections.pgdf', ...
+    'filter', @myFilter);
 ```
 
-Finally, there is an option to define a custom filter for data using
+### `loadPamguardBinaryFolder`
 
+Load multiple binary files from a folder using file pattern matching.
+
+**Syntax:**
 ```matlab
-myfilter = @myfilterfunction;
+[allData, allBackground, fileInfos] = loadPamguardBinaryFolder(dir, fileMask, verbose, filterfun, ...)
+[allData, allBackground] = loadPamguardBinaryFolder(dir, fileMask, verbose, filterfun, ...)
+allData = loadPamguardBinaryFolder(dir, fileMask, verbose, filterfun, ...)
+```
 
-[binarydata, fileinfo]= loadPamguardBinaryFile(myBinaryFile, 'filter', myfilter);
+**Parameters:**
+- `dir` - Directory containing binary files
+- `fileMask` - File pattern (e.g., '*.pgdf', 'WhistlesMoans_*.pgdf')
+- `verbose` - Progress logging interval (0 = no logging)
+- `filterfun` - Filter function or 0 for no filtering
+- Additional name-value pairs as in `loadPamguardBinaryFile`
 
-function [passed] = myfilterfunction(dataunit)
-    passed=false;
-    if (length(dataunit.wave)>100)
-        passed =true;
+**Examples:**
+
+Load all click detections:
+```matlab
+clickData = loadPamguardBinaryFolder('./Data', 'Click_*.pgdf', 1, 0);
+```
+
+Load whistle data with filtering:
+```matlab
+whistleData = loadPamguardBinaryFolder('./Data', 'WhistlesMoans_*.pgdf', ...
+    0, @myFilter, 'channel', 1);
+```
+
+### `loadPamguardMultiFile`
+
+Load specific data points from multiple files, useful for event-based analysis.
+
+**Syntax:**
+```matlab
+eventData = loadPamguardMultiFile(dir, fileNames, UIDs, verbose)
+```
+
+**Parameters:**
+- `dir` - Directory containing the files
+- `fileNames` - Cell array of filenames
+- `UIDs` - Array of UIDs to load (parallel to fileNames)
+- `verbose` - Progress logging (optional, default: 0)
+
+**Example:**
+
+Load specific detections from multiple files:
+```matlab
+files = {'clicks_20230115_100000.pgdf', 'clicks_20230115_110000.pgdf'};
+uids = [500001, 500123];
+eventData = loadPamguardMultiFile('./Data', files, uids, 1);
+```
+
+
+
+## Supported Modules
+
+PAMGuardMatlab supports the following PAMGuard modules:
+
+**Detectors:**
+- Click Detector
+- Whistle and Moan Detector
+- GPL Detector
+- Right Whale Edge Detector
+
+**Classifiers:**
+- Deep Learning Classifier
+
+**Processing Modules:**
+- AIS Processing
+- Clip Generator
+- DIFAR Processing
+- Long Term Spectral Average (LTSA)
+- Noise Band Monitor
+- Noise Monitor
+
+**Plugins:**
+- Sperm Whale IPI
+- Gemini Threshold Detector
+
+## Performance Tips
+
+1. **Use sorted flag** when loading time/UID ranges from chronologically ordered files
+2. **Specify file masks** when loading folders to avoid processing unnecessary files
+3. **Use filters** to reduce memory usage for large datasets
+4. **Load specific channels** rather than all channels when possible
+
+## Utility Functions
+
+To use the functions in +utils you will need to import that folder in every
+function that uses this library
+```matlab
+import pgmatlab.utils.*
+```
+
+### Channel Map Functions
+
+Convert channel lists to bitmaps:
+```matlab
+function channelMap = makeChannelMap(channels)
+    channelMap = 0;
+    for i = 1:length(channels)
+        channelMap = channelMap + bitshift(1, channels(i));
     end
 end
 ```
 
-### Load a folder of data
-
-There is a convenience function to load a folder of binary files. Folders contain a mix of data from different detections in PAMGuard and so the load folder function requires a `filemask` input to define which type of data to import. Below shows an example to load a folder of whistle contours. 
-
+Extract channels from bitmap:
 ```matlab
-binaryfolder= './Files/SomeBinaryFolder'
-filemask='WhistlesMoans_*.pgdf';
-whistles = loadPAMGuardBinaryFolder(binaryfolder,filemask);
+import pgmatlab.utils.*
+channels = getChannels(channelMap);
 ```
 
-To load different types of detections change the `filemask` variable to a filename identifier that is unique to the detection type. 
+### Time Conversion
 
-### Compatibility
+Convert milliseconds to MATLAB datenum:
+```matlab
+matlabTime = pgmatlab.utils.millisToDateNum(milliseconds);
+```
 
-PAMGuard-MATLAB should be compatible with Pamguard v2.00.15 and earlier.
+## Database Functions
+
+To use the functions in +db you will need to import that folder in every
+function that uses this library
+```matlab
+import pgmatlab.db.*
+```
+
+This folder contains an ad-hoc set of database functions written to support our own research. They 
+are not directly associated with reading binary files, but can be a useful companion to 
+the binary file functions. 
+
+### Getting a database connection
+
+If you're using the PAMGuard sqlite database, Matlab provide a built in function to open sqlite 
+database files
+```matlab
+conn = sqlite(dbfile,mode)
+```
+However, we've found that queries using connections from the sqlite function fail when any columms
+contain null data. Therefore, to read data from a PAMGuard database, we recommend using our own
+function
+```matlab
+import pgmatlab.db.*
+conn = sqlitedatabase(dbfile)
+```
+which uses a different library that supports null data. 
+
+**HOWEVER !!!**
+
+We've also found that the the sqlite function is slightly better at writing data than 
+sqlitedatabase. In particular, when writing TIMESTAMPS to a databsae, sqlitedatabase seems
+to convert times to long integer times in milliseconds, whereas a database opened with the sqlite
+function will write them correctly in a human readable date format. 
+
+So yes: Use sqlitedatabase to read from a PAMGuard database, and sqlite to write to one. 
+
+### Database Timestamp conversion
+
+Timestamps are usually returned in a String or char array format. Use the dbdate2datenum function
+to convert these data to Matlab dates
+
+```matlab
+import pgmatlab.utils.*
+import pgmatlab.db.*
+dbFile = './mydata/somedatabse.sqlite3';
+conn = sqlitedatabase(dbFile);
+data = conn.fetch('SELECT * FROM Sometableorother');
+matlabDates = dbdate2datenum(data.UTC);
+```
+
+Although Matlab now supports a more advanced date handling functions using datetime arrays, 
+we've found that the performance of these is poor and are currently sticking with the simple 
+numeric dates, which are the number of days that have elapsed since '00-Jan-0000'.
+
+
+## Compatibility
+
+- Compatible with PAMGuard v2.00.15 and later
+- Requires MATLAB R2016b or later
+- Supports Windows, macOS, and Linux
+
+## Contributing
+
+Contributions are welcome! See [contributing.md](contributing.md) for development guidelines, including:
+
+- How to set up the development environment
+- Testing procedures
+- How to add support for new PAMGuard modules
+- Pull request guidelines
+
+## License
+
+See [LICENSE](LICENSE) file for details.
+
+## Citation
+
+If you use PAMGuardMatlab in your research, please cite:
+
+```
+PAMGuardMatlab (2024). Zenodo. DOI: 10.5281/zenodo.16979862
+```
