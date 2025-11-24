@@ -120,7 +120,11 @@ for i = 1:numel(allFiles)
             data(j).clickNumber = j; % DEPRACATED: use uid instead of clickNumber to track specific nodes
             data(j).fileName = fileName;
         end
-        allData = [pgmatlab.utils.checkArrayAllocation(allData, nData + length(data), data(1)) data];
+        % this checkArrayAllocation function does not work like this. Don't
+        % use it. Just suffer manual concatenation of arrays - which only
+        % happens once per file, so not so bad. 
+        % allData = [pgmatlab.utils.checkArrayAllocation(allData, nData + length(data), data(1)) data];
+        allData = [allData, data];
         nData = nData + length(data);
     end
 
