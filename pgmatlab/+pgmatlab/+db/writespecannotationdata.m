@@ -46,8 +46,8 @@ elseif isstruct(data)
         cData{i,7} = data(i).ChannelBitmap;
         cData{i,8} = cData{i,7};
         cData{i,9} = data(i).Duration;
-        cData{i,10} = data(i).f1;
-        cData{i,11} = data(i).f2;
+        cData{i,10} = double(data(i).f1);
+        cData{i,11} = double(data(i).f2);
         if nargin >= 5
             for j = 1:numel(exColNames)
                 cData{i,11+j} = getfield(data(i), exColNames{j});
@@ -55,6 +55,8 @@ elseif isstruct(data)
         end
     end
     tableData = cell2table(cData, 'VariableNames',colNames);
+elseif iscell(data)
+    tableData = cell2table(data, 'VariableNames',colNames);
 end
 con = sqlite(dbName);
 con.sqlwrite(tableName, tableData);

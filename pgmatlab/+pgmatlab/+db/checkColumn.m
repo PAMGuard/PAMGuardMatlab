@@ -9,5 +9,5 @@ tableName = pgmatlab.utils.charArray(tableName);
 columnName = pgmatlab.utils.charArray(columnName);
 format = pgmatlab.utils.charArray(columnName);
 cmd = sprintf('ALTER TABLE %s ADD COLUMN %s %s', tableName, columnName, format);
-ans = exec(con, cmd);
+exec(con, cmd);
 e = pgmatlab.db.columnExists(con, tableName, columnName);

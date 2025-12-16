@@ -34,7 +34,7 @@ if pgmatlab.db.tableExists(con, tableName)
 end
 if e == 0 && create 
     c = sprintf('CREATE TABLE %s (\"Id\" COUNTER NOT NULL, Primary Key (Id))', tableName);
-    q = exec(con, c);
+    exec(con, c);
     e = pgmatlab.db.tableExists(con, tableName);
 end
 if nargin >= 5

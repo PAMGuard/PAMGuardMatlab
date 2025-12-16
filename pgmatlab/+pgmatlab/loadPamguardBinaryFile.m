@@ -165,6 +165,13 @@ try
                         % Clip Generator Module
                     case 'Clip Generator'
                         moduleObj = pgmatlab.core.modules.processing.ClipGenerator();
+                    
+                    % Gibbon detector (private plugin)
+                    case 'Gibbon Detector'
+                        switch fileInfo.fileHeader.streamName
+                            case 'Gibbon Results'
+                                moduleObj = pgmatlab.core.modules.processing.GibbonResult();
+                        end
 
                         % DbHt Module
                     case 'DbHt'
