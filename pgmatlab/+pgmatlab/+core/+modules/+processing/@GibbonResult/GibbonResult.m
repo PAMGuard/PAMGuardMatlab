@@ -12,7 +12,10 @@ classdef GibbonResult < pgmatlab.core.standard.StandardModule
             millisPerDay = 3600*24*1000;
             dOffs = [0:data.nResult-1]/data.nResult*data.millisDuration/millisPerDay;
             data.resultsDate = data.date + dOffs;
-
+            if (fileInfo.moduleHeader.version >=1) 
+                nL = fread(fid, 1, 'int16');
+                data.levels = fread(fid, nL, 'float32');
+            end
         end
     end
 end
