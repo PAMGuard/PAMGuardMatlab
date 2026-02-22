@@ -97,11 +97,12 @@ for i = 1:numel(unFiles)
     if isempty(eventData)
         eventData = fileData;
     else
-        eventData = pgmatlab.utils.checkArrayAllocation(eventData, numel(eventData) + numel(fileData), fileData(1));
-        eventData(end-numel(fileData)+1:end) = fileData;
+        eventData = [eventData fileData]; % safe
+        % eventData = pgmatlab.utils.checkArrayAllocation(eventData, numel(eventData) + numel(fileData), fileData(1));
+        % eventData(end-numel(fileData)+1:end) = fileData;
     end
     nEvents = nEvents + numel(fileData);
 end
 % Cut short preallocated eventData to the correct size
-eventData = eventData(1:nEvents);
+% eventData = eventData(1:nEvents);
 end
