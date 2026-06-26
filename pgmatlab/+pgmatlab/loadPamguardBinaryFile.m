@@ -374,8 +374,13 @@ if nBackground > 0
     fileInfo.background = background;
 end
 
-if ~isempty(moduleObj.objectType)
-    fileInfo.objectType = moduleObj.objectType;
+try
+if ~isempty(moduleObj)
+    if ~isempty(moduleObj.objectType)
+        fileInfo.objectType = moduleObj.objectType;
+    end
+end
+catch
 end
 
 % close the file and return to the calling function

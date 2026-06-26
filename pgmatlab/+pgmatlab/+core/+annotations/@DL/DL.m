@@ -57,7 +57,8 @@ classdef DL < pgmatlab.core.standard.StandardAnnotation
             % read the data from each model.
             % data = zeros(1, nummodels);
             for i=1:nummodels
-                data(i) = obj.readModelData(fid);
+                aDat = obj.readModelData(fid);
+                data.model(i) = aDat;
             end
         end
     end

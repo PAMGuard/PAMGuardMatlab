@@ -19,7 +19,7 @@ classdef Bearing < pgmatlab.core.standard.StandardAnnotation
             data.errors = fread(fid, data.nErrors, 'float32');
             if (anVersion >= 2) 
                 nAng = fread(fid, 1, 'int16');
-                data.refAngles = fread(fid, nAng, 'float32')
+                data.refAngles = fread(fid, nAng, 'float32');
             end
         end
     end
