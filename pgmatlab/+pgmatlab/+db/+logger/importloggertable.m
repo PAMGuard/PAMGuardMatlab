@@ -1,7 +1,12 @@
 % import an old logger lookup table to a PAMGUArd sqlite database. 
 
+import pgmatlab.db.logger.*
+import pgmatlab.db.*
+
 xlsFile = 'C:\PAMGuardTest\Goniometer\xlsforms\Lookup.xlsx'
 dbName = 'C:\PAMGuardTest\Goniometer\GoniometerTest.sqlite3'
+xlsFile = "C:\Users\dg50\OneDrive - University of St Andrews\Scans\SCANS-V\forms\Lookup.xlsx"
+dbName = 'C:\Users\dg50\OneDrive - University of St Andrews\Scans\SCANS-V\forms\ConvertedSCANSForms.sqlite3'
 
 con = sqlite(dbName);
 [colNames, colTypes, createStmt] = lookuptableformat();
@@ -13,6 +18,8 @@ for i = 1:h
 end
 
 tableName = 'Lookup'
+
+checkTable(con, tableName, true, colNames, colTypes)
 
 changes(1,:) = {'Order', 'DisplayOrder'};
 changes(2,:) = {'Text', 'ItemText'};

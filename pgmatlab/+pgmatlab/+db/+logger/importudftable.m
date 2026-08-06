@@ -1,6 +1,13 @@
 % convert a set of udf table from access to sqlite. 
 % tables were first exported as excel files. 
+import pgmatlab.db.logger.*
+import pgmatlab.db.*
+
 sqDb = 'C:\PAMGuardTest\Goniometer\GoniometerTest.sqlite3'
+sqDb = 'C:\Users\dg50\OneDrive - University of St Andrews\Scans\SCANS-V\forms\ConvertedSCANSForms.sqlite3'
+
+root = 'C:\PAMGuardTest\Goniometer\xlsforms\';
+root = 'C:\Users\dg50\OneDrive - University of St Andrews\Scans\SCANS-V\forms\'
 
 con = sqlite(sqDb);
 [colNames, colTypes, createStmt] = udftableformat();
@@ -18,8 +25,7 @@ changes(10,:) = {'GetControlData', 'Get_Control_Data'};
 changes(11,:) = {'Order', 'dumOrder'};
 changes(12,:) = {'Default', 'dumDefault'};
 
-root = 'C:\PAMGuardTest\Goniometer\xlsforms\';
-forms = dir([root '*.xlsx'])
+forms = dir([root 'UDF_*.xlsx'])
 
 for i = 1:numel(forms)
     xlsFile = fullfile(forms(i).folder, forms(i).name)
