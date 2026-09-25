@@ -43,31 +43,36 @@ classdef Difar < pgmatlab.core.standard.StandardModule
                 data.demuxData = fread(fid, [data.demuxedLength,3], 'int16') * data.maxVal / 32767;
             end
             
-            data.numMatches = fread(fid, 1, 'int16');
-            if (data.numMatches > 0)
-                data.latitude = fread(fid, 1, 'float');
-                data.longitude = fread(fid, 1, 'float');
+            % Up to version 2, each clip carries the crossing it was saved
+            % with. From version 3, crossings are stored in the database
+            % only, in the <unit>_Crossings tables, and clips have no tail.
+            if (fileInfo.moduleHeader.version <= 2)
+                data.numMatches = fread(fid, 1, 'int16');
+                if (data.numMatches > 0)
+                    data.latitude = fread(fid, 1, 'float');
+                    data.longitude = fread(fid, 1, 'float');
                 
-                if (fileInfo.moduleHeader.version >= 1)
-                    errorX = fread(fid,1,'float');
-                    errorY = fread(fid,1,'float');
-                    data.errors = [errorX errorY 0];
+                    if (fileInfo.moduleHeader.version >= 1)
+                        errorX = fread(fid,1,'float');
+                        errorY = fread(fid,1,'float');
+                        data.errors = [errorX errorY 0];
+                    end
+                
+                    for i=1:data.numMatches-1
+                        data.matchChan(i) = fread(fid, 1, 'int16');
+                        data.matchTime(i) = fread(fid, 1, 'int64');
+                    end
+                else
+                    data.latitude = 0;
+                    data.longitude = 0;
+                
+                    if (fileInfo.moduleHeader.version >= 1)
+                        data.errors = [0 0 0];
+                    end
+                
+                    data.matchChan(1) = 0;
+                    data.matchTime(1) = 0;
                 end
-                
-                for i=1:data.numMatches-1
-                    data.matchChan(i) = fread(fid, 1, 'int16');
-                    data.matchTime(i) = fread(fid, 1, 'int64');
-                end
-            else
-                data.latitude = 0;
-                data.longitude = 0;
-                
-                if (fileInfo.moduleHeader.version >= 1)
-                    data.errors = [0 0 0];
-                end
-                
-                data.matchChan(1) = 0;
-                data.matchTime(1) = 0;
             end
         end
     end
